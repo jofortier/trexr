@@ -78,6 +78,7 @@ kurtosis<-function (x, na.rm = FALSE)
   else kurtosis(as.vector(x), na.rm = na.rm)
 }
 
+
 cv<-function(x){
   sd(x, na.rm=T)/mean(x,na.rm=T)*100
 }
@@ -202,3 +203,113 @@ getExtension <- function(file){
   ex <- strsplit(basename(file), split="\\.")[[1]]
   return(ex[length(ex)])
 }
+
+
+
+# random ------------------------------------------------------------------
+
+
+myColorRamp <- function(colors, values) {
+  v <- (values - min(values))/diff(range(values))
+  x <- grDevices::colorRamp(colors)(v)
+  grDevices::rgb(x[,1], x[,2], x[,3], maxColorValue = 255)
+}
+
+
+#add in renderRGL
+# renderRglwidget_hack <- function(expr, env = parent.frame(), quoted = FALSE,
+#                             outputArgs = list()) {
+#   if (!quoted) { expr <- substitute(expr) } # force quoted
+#   markRenderFunction(rglwidgetOutput,
+#                      shinyRenderWidget(expr, rglwidgetOutput, env, quoted = TRUE),
+#                      outputArgs = outputArgs)
+# }
+# old UI treeCrown --------------------------------------------------------
+
+
+
+# shinydashboard::menuItem(
+#   "Explore Tree Detection",
+#   tabName = "chm_tree",
+#   icon = icon("door-open")
+# ),
+# conditionalPanel(condition = "input.menu1 === 'chm_tree'",
+#                  selectInput("fws",label =HTML("Local Maximum Filter <a href = 'https://jean-romain.github.io/lidRbook/itd-its.html#itd'>(help)</a>"),
+#
+#                              choices = c("3x3","5x5","7x7","9x9","11x11","13x13","15x15","17x17"),
+#                              selected="5x5")
+#
+# ,
+#
+# div(style ="margin-left: 2px;margin-top:-10px;color:white",
+#     radioButtons("radiustype", "Tree Crowns Delineation",
+#                  list("CrownSeg" = "FR","CrownAllometry" = "VR"),inline = TRUE)),
+#
+# conditionalPanel(condition="input.radiustype=='VR'",
+#                  div(style ="margin-left: 0px;color:white",
+#                      radioButtons("equation", " Equation: TCW = f(ht); ht= Height (m)",
+#                                   list("Deciduous" = "Deciduous","Pines" = "Pines","Combined"="Combined",
+#                                        "Use custom polynomial"="Custom"),inline = TRUE)),
+#                  conditionalPanel(condition="input.equation=='YR'",
+#                                   div(style = "margin-left: 2px;margin-top: -10px;color:white",
+#                                       HTML("|---Inter-----------ht------------ht^2--------ht^3-|")),
+#                                   div(class="row-fluid",
+#                                       div(class="span6",style = "margin-left: 0px;color:white",
+#                                           numericInput("Ang", "", "")),
+#                                       div(class="span6",style = "margin-left: 71px;margin-top: -68px;color:white",
+#                                           numericInput("ht1", "", "")),
+#                                       div(class="span6",style = "margin-left: 141px;margin-top: -68px;color:white",
+#                                           numericInput("ht2", "", "")),
+#                                       div(class="span6",style = "margin-left: 211px;margin-top: -68.2px;color:white",
+#                                           numericInput("ht3", "", ""))))),
+# conditionalPanel(condition="input.radiustype=='FR'",
+#                  div(style="margin-left: 2px;color:white;margin-top: -10px;",
+#                      sliderInput("maxcrown", "maxcrown",0,1,0.6,step=0.01,sep="#.##")),
+#                  div(style="margin-left: 2px;color:white;margin-top: -15px;",
+#                      sliderInput("exclusion","exclusion",0,1,0.3,step=0.01,sep="#.##"))),
+#
+#
+#                  div(style = "margin-left:0px; width:100px;margin-top:-35px;color:white",
+#                      radioButtons("filtertype", "",
+#                                   list("Mean" = "Mean","Gaussian" = "Gaussian"))),
+#                  conditionalPanel(condition="input.filtertype=='Mean'",
+#                                    div(style = "margin-left: 125px;text-align:center; width:130px;margin-top:-105px;color:white",
+#                                       selectInput("sws", "Filter Windows Size",
+#                                                   choices = c("3x3","5x5","7x7","9x9","11x11","13x13","15x15","17x17"),selected="3x3"))),
+#
+#                  conditionalPanel(condition="input.filtertype=='Gaussian'",
+#                                   div(style = "color:white;margin-top:-15px;margin-left: 2px;",
+#                                       sliderInput("Sigma","Gaussian Sigma ",0.1,3,1.5,step=0.01,format="#.##"))),
+#
+# div(style = "color:white;margin-top:-20px",
+#     radioButtons("plotCHM2d", "", list("CHM 2d" = "plotchm2d",
+#                                        "Lorenz curve" = "plotlorenzcurve"),inline = TRUE),
+#     div(style = "color:white;margin-top:-30px",
+#         radioButtons("plotProfile", "", list("CHM profile" = "plotCHMProfile",
+#                                              "Ripley's K and L" = "plotRipley"),inline = TRUE)),
+#
+#     div(style = "color:white;margin-top:-30px",
+#         radioButtons("plot3Dradio", "", list("CHM 3d" = "plotCHM3D",
+#                                              "Trees 3d" = "plot3Dtrees"),inline = TRUE)),
+#
+#     conditionalPanel(condition="input.plot3Dradio=='plot3Dtrees'",
+#                      div(style = "color:white;margin-top:-10px;width:130px",
+#                          selectInput("plotShape", "Shape",
+#                                      choices = c("cone","ellipsoid","halfellipsoid","paraboloid","cylinder"),selected="halfellipsoid"),
+#                          div(style = "color:white;margin-top:-78px;width:130px;margin-left: 145px",
+#                              selectInput("plotSurface", "Surface",
+#                                          choices = c("solid","mesh","lines"),selected="lines"))
+#                      )
+#                      ),div(style="margin-left: 2px;margin-top:-15px;",
+#     actionButton('run_but', label = "Run Selections"))
+
+
+#      shinydashboard::tabItem(
+#        tabName = "chm_tree",
+#        fluidRow(
+#                 tabPanel(title = 'Explore Tree Detection', style = 'height:92vh;',
+#                          shinydashboard::box(mod_panel_tree_detection_stats_plot_ui("panel_tree_detection_stats_plot_ui_1"), width = 6, title = 'Plotting'),
+#                          shinydashboard::box(mod_panel_tree_detection_stats_ui("panel_tree_detection_stats_ui_1")%>% shinycssloaders::withSpinner(), width = 6, title = 'Graphing'),
+#                          shinydashboard::box(mod_panel_tree_detection_leaflet_ui("panel_tree_detection_leaflet_ui_1") %>% shinycssloaders::withSpinner(), width = 6, title = 'Mapping')))
+#
+# )

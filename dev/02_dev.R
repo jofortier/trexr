@@ -17,17 +17,34 @@
 ## Add one line by package you want to add as dependency
 usethis::use_package( "thinkr" )
 usethis::use_package( "shinydashboard" )
+usethis::use_package( "shinydashboardPlus" )
 usethis::use_package( "ggplot2" )
-usethis::use_package( "thinkr" )
-usethis::use_package( "thinkr" )
-usethis::use_package( "thinkr" )
+usethis::use_package( "raster" )
+usethis::use_package('rasterVis')
+usethis::use_package( "rglwidget" )
+usethis::use_package( "shinyFiles" )
+usethis::use_package('mapedit')
+usethis::use_package('lidR')
+usethis::use_package('sf')
+usethis::use_package('plotly')
 
 ## Add modules ----
 ## Create a module infrastructure in R/
+golem::add_module(name = 'in_file')
 golem::add_module( name = "panel_stats" ) # Name of the module
 golem::add_module( name = "panel_stat_plot" ) # Name of the module
 golem::add_module( name = "panel_leaflet" )
 golem::add_module( name = "panel_3d" )
+golem::add_module(name = 'panel_plot_map')
+golem::add_module(name = 'panel_3d_big')
+# golem::add_module(name = 'cross_section')
+# golem::add_module(name = 'las_select')
+# golem::add_module(name = 'panel_tree_detection_stats')
+# golem::add_module(name = 'panel_tree_detection_stats_plot')
+# golem::add_module(name = 'panel_tree_detection_leaflet')
+# golem::add_module(name = 'panel_tree_detection_3d')
+# golem::add_module(name = 'trexr_logo')
+
 ## Add helper functions ----
 ## Creates ftc_* and utils_*
 golem::add_fct( "helpers" )

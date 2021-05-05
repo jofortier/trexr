@@ -2,17 +2,35 @@ Package: trexr
 Title: Tree Exploration in R
 Version: 0.0.0.9000
 Authors@R: person('Josh', 'Erickson', email = 'joshualerickson@gmail.com', role = c('cre', 'aut'))
-Description: Explore trees in R with lidR and treetop packages
-License: What license is it under?
+Description: Explore trees in R with various outputs, e.g. map, 3d, plots and stats.
+License: MIT + file LICENSE
 Imports: 
     config,
     ggplot2,
     golem,
     htmltools,
+    methods,
+    leafem,
+    leaflet,
+    leaflet.extras,
+    rgeos,
+    rgl,
+    rlang,
+    shinycssloaders,
+    sp,
+    stars,
+    fs,
+    magrittr,
     processx,
+    raster,
+    rasterVis,
+    rglwidget,
+    sf,
     shiny,
     shinydashboard,
-    thinkr
+    shinydashboardPlus,
+    thinkr,
+    geometry
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
