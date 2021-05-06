@@ -26,7 +26,7 @@ mod_panel_stats_server <- function(input, output, session, in_ras, clear_map){
   observeEvent(in_ras$chmR_rec, {
 
     if(is.null(in_ras$ras_crop)){
-      print('chmR')
+
 
   in_ras$area_ha <- (raster::ncell(in_ras$chmR)*raster::res(in_ras$chmR)[1]^2)/10000
   chm_hts<-in_ras$chmR[!is.na(in_ras$chmR)]
@@ -55,7 +55,7 @@ mod_panel_stats_server <- function(input, output, session, in_ras, clear_map){
 })
 
     } else {
-      print('ras_crop')
+
       in_ras$area_ha <- (raster::ncell(in_ras$ras_crop)*raster::res(in_ras$ras_crop)[1]^2)/10000
       chm_hts<-in_ras$ras_crop[!is.na(in_ras$ras_crop)]
 
@@ -85,7 +85,7 @@ mod_panel_stats_server <- function(input, output, session, in_ras, clear_map){
 })
 
   observeEvent(in_ras$rec_feat, {
-print('rec_feat')
+
     in_ras$area_ha <- (raster::ncell(in_ras$ras_crop)*raster::res(in_ras$ras_crop)[1]^2)/10000
     chm_hts<-in_ras$ras_crop[!is.na(in_ras$ras_crop)]
 
