@@ -49,7 +49,8 @@ app_ui <- function(request) {
                                        ))),
 
       shinydashboard::dashboardBody(tags$head(
-        tags$link(rel = "shortcut icon", href = "hex-trexr.png")),
+        tags$link(rel = "shortcut icon", href = "hex-trexr.png"),
+        includeCSS("www/style.css")),
     shinydashboard::tabItems(
       shinydashboard::tabItem(
         tabName = "get_started"),
@@ -95,8 +96,7 @@ golem_add_external_resources <- function(){
     bundle_resources(
       path = app_sys('app/www'),
       app_title = 'trexr'
-    ),
-    includeCSS("style.css")
+    )
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert()
   )
