@@ -44,7 +44,7 @@ if(plot_rad() == 'hist'){
 }
 
     if (plot_rad() == 'dens'){
-      print('hello world')
+
   f_all <- raster::density(in_ras$chmR, plot = F)
   dat <- data.frame(x= f_all$x, y = f_all$y)
   output$hist <- shiny::renderPlot({
@@ -85,7 +85,7 @@ if(plot_rad() == 'hist'){
             }
 
           if (plot_rad() == 'dens'){
-            print('no idea whats going on')
+
               f_all <- raster::density(in_ras$ras_crop, plot = F)
               dat <- data.frame(x= f_all$x, y = f_all$y)
               output$hist <- shiny::renderPlot({

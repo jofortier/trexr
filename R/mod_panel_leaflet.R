@@ -122,29 +122,29 @@ intersection <- reactive(raster::intersect(raster::extent(in_ras$chmR), raster::
 
       } else {
 
-      in_ras$ras_crop <- ras_crop
+
 
 
       output$leaf_map <- leaflet::renderLeaflet({
 
 
         myPal <- myColorRamp(c("blue","green","yellow","red"),0:255)
-        val <- as.numeric(seq(raster::cellStats(in_ras$ras_crop, min), raster::cellStats(in_ras$ras_crop, max), 1))
+        val <- as.numeric(seq(raster::cellStats(ras_crop, min), raster::cellStats(ras_crop, max), 1))
         pal = leaflet::colorNumeric(myPal, val,
                                     na.color = "transparent")
-        chmR <- in_ras$ras_crop
-        reschmR<-raster::res(chmR)[1]
-        newst<-raster::extent(chmR)
 
-        r1NaM <- is.na(raster::as.matrix(chmR))
-        colNotNA <- which(colSums(r1NaM) != nrow(chmR))
-        rowNotNA <- which(rowSums(r1NaM) != ncol(chmR))
+        reschmR<-raster::res(ras_crop)[1]
+        newst<-raster::extent(ras_crop)
 
-        exst <- raster::extent(chmR, rowNotNA[1], rowNotNA[length(rowNotNA)],
+        r1NaM <- is.na(raster::as.matrix(ras_crop))
+        colNotNA <- which(colSums(r1NaM) != nrow(ras_crop))
+        rowNotNA <- which(rowSums(r1NaM) != ncol(ras_crop))
+
+        exst <- raster::extent(ras_crop, rowNotNA[1], rowNotNA[length(rowNotNA)],
                                colNotNA[1], colNotNA[length(colNotNA)])
-        chmR <- raster::crop(chmR,exst)
-
-        base_map() %>% leaflet::addRasterImage(x = chmR, group = 'Raster', colors = myPal) %>%
+        ras_crop <- raster::crop(ras_crop,exst)
+        in_ras$ras_crop <- ras_crop
+        base_map() %>% leaflet::addRasterImage(x = ras_crop, group = 'Raster', colors = myPal) %>%
           leaflet::addLegend(pal = pal, values = val, position = "bottomright") %>%
           leaflet::addLayersControl(overlayGroups = c('Raster', 'Hydrography'), baseGroups = c("Esri.WorldImagery",
                                                                                                "CartoDB.Positron",
