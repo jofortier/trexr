@@ -50,7 +50,7 @@ app_ui <- function(request) {
 
       shinydashboard::dashboardBody(tags$head(
         tags$link(rel = "shortcut icon", href = "hex-trexr.png"),
-        includeCSS("www/style.css")),
+        includeCSS("style.css")),
     shinydashboard::tabItems(
       shinydashboard::tabItem(
         tabName = "get_started"),
