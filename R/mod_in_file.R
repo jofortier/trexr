@@ -22,48 +22,24 @@ mod_in_file_ui <- function(id){
 #'
 #' @noRd
 mod_in_file_server <- function(input, output, session, in_ras,HTboxI, file_path, clear_map, change_ht,
-                               input_box, feet){
+                               input_box, feet, values){
   ns <- session$ns
 
   observe({
+
   inFile<- file_path()
   if (is.null(inFile)){
     return(NULL)}
 
-  fileExt<-getExtension(inFile$name)
-
-  if (!any(fileExt==c("tif","asc","img"))){
-
-    withProgress(message = "Invalid file; Please upload a raster ('.tif', '.asc' or '.img') file!",
-                 value = 1,detail = "Treetop will be refreshed!",{
-                   Sys.sleep(10)
-                   #return(NULL)
-                   #validate("Invalid file; Please upload a raster (".tif", ".asc" or ".img") file!")
-                   session$reload()
-
-                 })
-  }
-
   chmR<-raster::raster(inFile$datapath)
   chmR[chmR[]<0]<-0
 
-  isolate({
+  input_box$box_og <- 0
 
-
-    Htreshoud<-HTboxI()
-
-
-  })
-
-  input_box$box_rec <- reactive(Htreshoud)
-  input_box$box_og <- Htreshoud
-  chmR[chmR[]<Htreshoud] <- NA
+  chmR[chmR[]<0] <- NA
 
   projecCHM <- raster::projection(chmR)
   in_ras$projectCHM <- projecCHM
-  area_ha<-0
-  reschmR<-raster::res(chmR)[1]
-  newst<-raster::extent(chmR)
 
   r1NaM <- is.na(raster::as.matrix(chmR))
   colNotNA <- which(colSums(r1NaM) != nrow(chmR))
@@ -72,6 +48,7 @@ mod_in_file_server <- function(input, output, session, in_ras,HTboxI, file_path,
   exst <- raster::extent(chmR, rowNotNA[1], rowNotNA[length(rowNotNA)],
                          colNotNA[1], colNotNA[length(colNotNA)])
   chmR <- raster::crop(chmR,exst)
+
 if(feet()== 1){
 
   chmR <- chmR*3.28084
@@ -84,6 +61,8 @@ if(feet()== 1){
 
   in_ras$ras_crop <- NULL
 
+  values$sf <- NULL
+
 } else {
 
   in_ras$chmR <- chmR
@@ -93,9 +72,11 @@ if(feet()== 1){
   in_ras$chmR_rec <- reactive(in_ras$chmR)
 
   in_ras$ras_crop <- NULL
-}
 
-    })
+  values$sf <- NULL
+}
+  })
+
 
   observeEvent(change_ht(),{
 
@@ -129,13 +110,23 @@ if(feet()== 1){
                            colNotNA[1], colNotNA[length(colNotNA)])
     chmR <- raster::crop(chmR,exst)
 
-    in_ras$chmR <- chmR
 
-    in_ras$chmR_rec <- reactive(in_ras$chmR)
+if(is.null(in_ras$ras_crop)){
 
+  in_ras$chmR <- chmR
+  in_ras$chmR_rec <- reactive(in_ras$chmR)
 
+} else {
+
+  in_ras$ras_crop <- chmR
+  in_ras$chmR_rec <- reactive(in_ras$ras_crop)
+
+}
 
   })
+
+
+
 
   observeEvent(clear_map(),{
 

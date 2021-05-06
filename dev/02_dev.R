@@ -26,7 +26,7 @@ usethis::use_package( "shinyFiles" )
 usethis::use_package('mapedit')
 usethis::use_package('lidR')
 usethis::use_package('sf')
-usethis::use_package('plotly')
+usethis::use_package('dashboardthemes')
 
 ## Add modules ----
 ## Create a module infrastructure in R/

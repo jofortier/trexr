@@ -20,26 +20,22 @@ mod_panel_leaflet_ui <- function(id){
 #' panel_leaflet Server Function
 #'
 #' @noRd
-mod_panel_leaflet_server <- function(input, output, session, in_ras, clear_map){
+mod_panel_leaflet_server <- function(input, output, session, in_ras, clear_map, values){
   ns <- session$ns
-
- #cb <- colorBin(palette = myPal, bins = at, domain = at)
-
 
   observeEvent(in_ras$chmR_rec, {
   output$leaf_map <- leaflet::renderLeaflet({
    validate(need(!is.null(in_ras$chmR), 'Waiting for Raster'))
 
 
- myPal <- myColorRamp(c("blue","green","yellow","red"),0:255)
- val <- as.numeric(seq(raster::cellStats(in_ras$chmR, min), raster::cellStats(in_ras$chmR, max), 1))
- pal = leaflet::colorNumeric(myPal, val,
-                    na.color = "transparent")
-
-
  if(!is.null(in_ras$ras_crop)){
+   myPal <- myColorRamp(c("blue","green","yellow","red"),0:255)
+   val <- as.numeric(seq(raster::cellStats(in_ras$ras_crop, min), raster::cellStats(in_ras$ras_crop, max), 1))
 
-   base_map() %>% leaflet::addRasterImage(x = in_ras$chmR, group = 'Raster', colors = pal) %>%
+   pal = leaflet::colorNumeric(myPal, val,
+                               na.color = "transparent")
+
+   base_map() %>% leaflet::addRasterImage(x = in_ras$ras_crop, group = 'Raster', colors = pal) %>%
      leaflet::addLegend(pal = pal, values = val, position = "bottomright") %>%
      leaflet::addLayersControl(overlayGroups = c('Raster', 'Hydrography'), baseGroups = c("Esri.WorldImagery",
                                                                                           "CartoDB.Positron",
@@ -48,66 +44,36 @@ mod_panel_leaflet_server <- function(input, output, session, in_ras, clear_map){
                                                                                           "OpenTopoMap"))
 
  } else {
-
-    base_map() %>% leaflet::addRasterImage(x = in_ras$chmR, group = 'Raster', colors = pal) %>%
+   myPal <- myColorRamp(c("blue","green","yellow","red"),0:255)
+   val <- as.numeric(seq(raster::cellStats(in_ras$chmR, min), raster::cellStats(in_ras$chmR, max), 1))
+   pal = leaflet::colorNumeric(myPal, val,
+                               na.color = "transparent")
+   base_map() %>% leaflet::addRasterImage(x = in_ras$chmR, group = 'Raster', colors = pal) %>%
       leaflet::addLegend(pal = pal, values = val, position = "bottomright") %>%
       leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F,circleMarkerOptions = F,
                                      rectangleOptions = leaflet.extras::drawRectangleOptions(repeatMode = TRUE),
-                                     markerOptions = leaflet.extras::drawMarkerOptions(repeatMode = TRUE),
+                                     markerOptions = F,
                                      polygonOptions = leaflet.extras::drawPolygonOptions(repeatMode = TRUE)) %>%
       leaflet::addLayersControl(overlayGroups = c('Raster', 'Hydrography'), baseGroups = c("Esri.WorldImagery",
                                                                                                                  "CartoDB.Positron",
                                                                                                                  "OpenStreetMap",
-                                                                                                                 "CartoDB.DarkMatter",
-                                                                                                                 "OpenTopoMap"))
+                                                                                                                 "CartoDB.DarkMatter","OpenTopoMap"))
+
+
+
 }
 })
 })
-  shiny::observeEvent(clear_map(), {
 
-
-
-    values$sf <- NULL
-
-map_update <- shiny::reactive({
-
-
-  myPal <- myColorRamp(c("blue","green","yellow","red"),0:255)
-  val <- as.numeric(seq(raster::cellStats(in_ras$chmR_og, min), raster::cellStats(in_ras$chmR_og, max), 1))
-  pal = leaflet::colorNumeric(myPal, val,
-                              na.color = "transparent")
-
-  base_map() %>% leaflet::addRasterImage(x = in_ras$chmR_og, group = 'Raster', colors = myPal)%>%
-    leaflet::addLegend(pal = pal, values = val, position = "bottomright") %>%
-    leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F,circleMarkerOptions = F,
-                                   rectangleOptions = leaflet.extras::drawRectangleOptions(repeatMode = TRUE),
-                                   markerOptions = leaflet.extras::drawMarkerOptions(repeatMode = TRUE),
-                                   polygonOptions = leaflet.extras::drawPolygonOptions(repeatMode = TRUE)) %>%
-    leaflet::addLayersControl(overlayGroups = c('Raster', 'Hydrography'), baseGroups = c("Esri.WorldImagery",
-                                                                                         "CartoDB.Positron",
-                                                                                         "OpenStreetMap",
-                                                                                         "CartoDB.DarkMatter",
-                                                                                         "OpenTopoMap"))
-})
-
-    output$leaf_map <- leaflet::renderLeaflet({
-
-                        map_update()
-
-
-    })
-
-  })
-
-
-  #store the sf in a reactiveValues
-  values <- shiny::reactiveValues()
-  values$sf <- sf::st_sf(sf::st_sfc(crs = 4326))
 
   #update map with user input
   shiny::observeEvent(input$leaf_map_draw_new_feature, {
 
-    in_ras$rec_feat <- reactive(input$leaf_map_draw_new_feature)
+
+values$sf <- NULL
+
+  values$sf <- sf::st_sf(sf::st_sfc(crs = 4326))
+
     feat <- input$leaf_map_draw_new_feature
     coords <- unlist(feat$geometry$coordinates)
     coords <- matrix(coords, ncol = 2, byrow = T)
@@ -118,7 +84,43 @@ map_update <- shiny::reactive({
 
       bbox <- shiny::reactive(values$sf %>% sf::st_transform(crs = raster::crs(in_ras$chmR)))
 
+      sf_pt <- reactive(sf::st_centroid(values$sf))
+
       ras_crop <- raster::mask(in_ras$chmR, bbox())
+
+intersection <- reactive(raster::intersect(raster::extent(in_ras$chmR), raster::extent(bbox())))
+
+      if(is.null(intersection())) {
+
+        output$leaf_map <- leaflet::renderLeaflet({
+
+
+
+          myPal <- myColorRamp(c("blue","green","yellow","red"),0:255)
+          val <- as.numeric(seq(raster::cellStats(in_ras$chmR, min), raster::cellStats(in_ras$chmR, max), 1))
+          pal = leaflet::colorNumeric(myPal, val,
+                                      na.color = "transparent")
+
+
+          base_map() %>%
+            leaflet::addRasterImage(x = in_ras$chmR, group = 'Raster', colors = myPal) %>%
+            leaflet::addPopups(sf_pt()[[1]][[1]][[1]], sf_pt()[[1]][[1]][[2]], 'Please select within the raster area!',
+                      options = leaflet::popupOptions(closeButton = TRUE)
+            ) %>%
+            leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F,circleMarkerOptions = F,
+                                           rectangleOptions = leaflet.extras::drawRectangleOptions(repeatMode = TRUE),
+                                           markerOptions = F,
+                                           polygonOptions = leaflet.extras::drawPolygonOptions(repeatMode = TRUE)) %>%
+            leaflet::addLayersControl(overlayGroups = c('Raster', 'Hydrography'), baseGroups = c("Esri.WorldImagery",
+                                                                                                 "CartoDB.Positron",
+                                                                                                 "OpenStreetMap",
+                                                                                                 "CartoDB.DarkMatter",
+                                                                                                 "OpenTopoMap"))
+
+        })
+
+
+      } else {
 
       in_ras$ras_crop <- ras_crop
 
@@ -130,8 +132,19 @@ map_update <- shiny::reactive({
         val <- as.numeric(seq(raster::cellStats(in_ras$ras_crop, min), raster::cellStats(in_ras$ras_crop, max), 1))
         pal = leaflet::colorNumeric(myPal, val,
                                     na.color = "transparent")
+        chmR <- in_ras$ras_crop
+        reschmR<-raster::res(chmR)[1]
+        newst<-raster::extent(chmR)
 
-        base_map() %>% leaflet::addRasterImage(x = in_ras$ras_crop, group = 'Raster', colors = myPal) %>%
+        r1NaM <- is.na(raster::as.matrix(chmR))
+        colNotNA <- which(colSums(r1NaM) != nrow(chmR))
+        rowNotNA <- which(rowSums(r1NaM) != ncol(chmR))
+
+        exst <- raster::extent(chmR, rowNotNA[1], rowNotNA[length(rowNotNA)],
+                               colNotNA[1], colNotNA[length(colNotNA)])
+        chmR <- raster::crop(chmR,exst)
+
+        base_map() %>% leaflet::addRasterImage(x = chmR, group = 'Raster', colors = myPal) %>%
           leaflet::addLegend(pal = pal, values = val, position = "bottomright") %>%
           leaflet::addLayersControl(overlayGroups = c('Raster', 'Hydrography'), baseGroups = c("Esri.WorldImagery",
                                                                                                "CartoDB.Positron",
@@ -143,27 +156,10 @@ map_update <- shiny::reactive({
 
       })
 
+      in_ras$rec_feat <- reactive(input$leaf_map_draw_new_feature)
+}
     })
 
-observeEvent(in_ras$ras_crop_rec,{
-  output$leaf_map <- leaflet::renderLeaflet({
-
-      myPal <- myColorRamp(c("blue","green","yellow","red"),0:255)
-      val <- as.numeric(seq(raster::cellStats(in_ras$chmR, min), raster::cellStats(in_ras$chmR, max), 1))
-      pal = leaflet::colorNumeric(myPal, val,
-                                  na.color = "transparent")
-
-      base_map() %>% leaflet::addRasterImage(x = in_ras$chmR, group = 'Raster', colors = myPal) %>%
-        leaflet::addLegend(pal = pal, values = val, position = "bottomright") %>%
-        leaflet::addLayersControl(overlayGroups = c('Raster', 'Hydrography'), baseGroups = c("Esri.WorldImagery",
-                                                                                             "CartoDB.Positron",
-                                                                                             "OpenStreetMap",
-                                                                                             "CartoDB.DarkMatter",
-                                                                                             "OpenTopoMap"))
-
-})
-
-    })
 
 }
 

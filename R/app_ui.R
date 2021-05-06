@@ -16,13 +16,11 @@ app_ui <- function(request) {
                                           shinydashboardPlus::userOutput('trexr')
                                       ),
 
-      shinydashboard::dashboardSidebar(width = 300,
+      shinydashboard::dashboardSidebar(width = 300,dashboardthemes::shinyDashboardThemes(
+        theme = "blue_gradient"),
+
                                        shinydashboard::sidebarMenu(id = 'menu1',
-                                         shinydashboard::menuItem(
-                                           "Welcome",
-                                           tabName = "get_started",
-                                           icon = icon("door-open")
-                                         ),
+
                                          shinydashboard::menuItem(
                                            "Explore Canopy Height Model",
                                            tabName = "chm_cp",
@@ -41,8 +39,13 @@ app_ui <- function(request) {
 
                                                                                               selectInput("sws", "Pick a window size.",
                                                                                                           choices = c("3x3","5x5","7x7","9x9"),selected="3x3")),
-                                                        actionButton('clear', "Fresh Start"),
-                                                        actionButton('change_ht', 'Run (change height)')
+                                                        div(style="display:inline-block;width:32%;text-align: center;",actionButton('clear', "Fresh Start")),
+                                                            div(style="display:inline-block;width:32%;text-align: center;",
+                                                                actionButton('change_ht', 'Run (change height)'))),
+                                       shinydashboard::menuItem(
+                                         "About",
+                                         tabName = "get_started",
+                                         icon = icon("door-open")
                                        ))),
 
       shinydashboard::dashboardBody(tags$head(
@@ -58,11 +61,12 @@ app_ui <- function(request) {
                                tabPanel(title = 'Explore CHM', style = "height:92vh;",
                                         shinydashboard::box( uiOutput('logic') %>% shinycssloaders::withSpinner(), width = 6, title = 'Mapping'),
                                         shinydashboard::box( mod_panel_3d_ui("panel_3d_ui_1"), width = 6, title = '3D Mapping'),
-                                        shinydashboard::box(mod_panel_stat_plot_ui("panel_stat_plot_ui_1"), width = 6, title = "Plotting"),
-                                        shinydashboard::box(mod_panel_stats_ui("panel_stats_ui_1"), width = 6, title = 'Summary Stats')
-                                       ),
-                               tabPanel(title = '3d-big',
-                                        column(12, align='center',mod_panel_3d_ui("panel_3d_big_ui_1") %>% shinycssloaders::withSpinner()))
+                                        shinydashboard::box(mod_panel_stat_plot_ui("panel_stat_plot_ui_1"), width = 6,height = '500px', title = "Plotting",
+                                                            radioButtons('plot_rad', label = '', choices = list('Boxplot' = 'bp', 'Density' = 'dens',
+                                                                                                                'Histogram' = 'hist'), selected = 'hist',
+                                                                         inline = TRUE)),
+                                        shinydashboard::box(mod_panel_stats_ui("panel_stats_ui_1"), width = 6, height = '500px', title = 'Summary Stats')
+                                       )
 
                                )))
 
@@ -91,7 +95,8 @@ golem_add_external_resources <- function(){
     bundle_resources(
       path = app_sys('app/www'),
       app_title = 'trexr'
-    )
+    ),
+    includeCSS("www/style.css")
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert()
   )
