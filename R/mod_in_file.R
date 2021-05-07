@@ -111,7 +111,7 @@ if(feet()== 1){
 
 if(raster::cellStats(chmR, mean) == 'NaN'){shinyalert::shinyalert(
   title = "Filtering Error",
-  text = "You are trying to filter on data that's not there....",
+  text = "No canopy values found within the defined height range.",
   size = "s",
   closeOnEsc = TRUE,
   closeOnClickOutside = TRUE,
