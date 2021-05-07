@@ -51,6 +51,12 @@ color: #000000;
 .checkbox {margin: 0}
         .checkbox p {margin: 0;}
 
-.hidden-xs {
-  color: #000000;
-}
+.butt1  {
+      background-color:rgba(0,0,0,0);
+      color: black;
+      font-family: Courier New;
+      border-color: #ddd;
+      -webkit-box-shadow: 0px;
+      box-shadow: 0px;
+      opacity: 1;
+    }

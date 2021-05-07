@@ -51,7 +51,15 @@ mod_panel_leaflet_server <- function(input, output, session, in_ras, clear_map, 
        primaryAreaUnit = "acres",
        activeColor = "#000000",
        completedColor = "#FF0000"
-     )
+     )%>%
+     htmlwidgets::onRender("
+        function(el, x) {
+          var myMap = this;
+          myMap.on('measurefinish',
+            function (e) {
+              Shiny.onInputChange('selectedPoints', e.points);
+            })
+        }")
 
  } else {
    myPal <- myColorRamp(c("blue","green","yellow","red"),0:255)
@@ -74,12 +82,24 @@ mod_panel_leaflet_server <- function(input, output, session, in_ras, clear_map, 
        primaryAreaUnit = "acres",
        activeColor = "#000000",
        completedColor = "#FF0000"
-     )
+     ) %>%
+     htmlwidgets::onRender("
+        function(el, x) {
+          var myMap = this;
+          myMap.on('measurefinish',
+            function (e) {
+              Shiny.onInputChange('selectedPoints', e.points);
+            })
+        }")
 
 
 
-}
+ }
+
+
 })
+
+
 })
 
 
@@ -141,7 +161,15 @@ intersection <- reactive(raster::intersect(raster::extent(in_ras$chmR), raster::
               primaryAreaUnit = "acres",
               activeColor = "#000000",
               completedColor = "#FF0000"
-            )
+            ) %>%
+            htmlwidgets::onRender("
+        function(el, x) {
+          var myMap = this;
+          myMap.on('measurefinish',
+            function (e) {
+              Shiny.onInputChange('selectedPoints', e.points);
+            })
+        }")
 
         })
 
@@ -183,7 +211,15 @@ intersection <- reactive(raster::intersect(raster::extent(in_ras$chmR), raster::
             primaryAreaUnit = "acres",
             activeColor = "#000000",
             completedColor = "#FF0000"
-          )
+          ) %>%
+          htmlwidgets::onRender("
+        function(el, x) {
+          var myMap = this;
+          myMap.on('measurefinish',
+            function (e) {
+              Shiny.onInputChange('selectedPoints', e.points);
+            })
+        }")
 
 
 

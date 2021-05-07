@@ -45,7 +45,14 @@ app_ui <- function(request) {
                                                                                                           choices = c("3x3","5x5","7x7","9x9"),selected="3x3")),
                                                         div(style="display:inline-block;width:32%;text-align: center;",actionButton('clear', "Fresh Start")),
                                                             div(style="display:inline-block;width:32%;text-align: center;",
-                                                                actionButton('change_ht', 'Run (change height)'))),
+                                                                actionButton('change_ht', 'Run (change height)')),
+                                                       checkboxInput('dwnshps', 'Download Finished Measurements?', value = FALSE),
+                                                       conditionalPanel(condition = "input.dwnshps=='1'",
+                                                                            textInput('export_filename', label = 'Filename'),
+                                                                        selectInput('export_format', 'Select Format', choices = c("shp", "kml")),
+
+                                                                                downloadButton("downloadData", label = "Download",
+                                                                                               class = 'butt1'))),
                                        shinydashboard::menuItem(
                                          "About",
                                          tabName = "get_started",

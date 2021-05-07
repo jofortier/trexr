@@ -18,6 +18,7 @@ app_server <- function( input, output, session ) {
   ctg_reac <- reactiveValues()
   input_box <- reactiveValues()
   values <- shiny::reactiveValues()
+  points <- reactiveValues()
 
   callModule(mod_in_file_server, "in_file_ui_1",
              in_ras = in_ras,
@@ -97,6 +98,51 @@ app_server <- function( input, output, session ) {
 
     }
 
+  })
+
+  points$pts <- reactive(input$selectedPoints)
+
+
+  observeEvent(input$selectedPoints,{
+
+
+
+    points$pts_new <- data.frame(lat = points$pts()[points$pts()>0], lng = points$pts()[points$pts()<0]) %>%
+      sf::st_as_sf(coords = c('lng', 'lat'), crs = 4326)
+
+    output$downloadData <- downloadHandler(
+      filename = function() {
+        if(input$export_format == "shp"){
+          paste0(input$export_filename, ".zip")
+        }else if (input$export_format == "kml"){
+          paste0(input$export_filename, ".kml")
+        }
+      },
+      content = function(file) {
+
+        tmp.path <- dirname(file)
+        name.base <- file.path(tmp.path, input$export_filename)
+        #name.base <- file.path(tmp.path)
+        name.glob <- paste0(name.base, ".*")
+        name.shp  <- paste0(name.base, ".shp")
+        name.zip  <- paste0(name.base, ".zip")
+
+        if (length(Sys.glob(name.glob)) > 0) file.remove(Sys.glob(name.glob))
+
+        if(input$export_format == "shp"){
+
+          sf::st_write(points$pts_new, dsn = name.shp, layer = "shpExport",
+                       driver = "ESRI Shapefile", quiet = TRUE)
+
+          zip::zipr(zipfile = name.zip, files = Sys.glob(name.glob))
+          req(file.copy(name.zip, file))
+
+        } else if (input$export_format == "kml"){
+          sf::st_write(points$pts_new, dsn = file, layer = "chm_kml", driver = "KML",
+                       quiet = TRUE)
+        }
+      }
+    )
   })
   callModule(mod_panel_leaflet_server, "panel_leaflet_ui_1", in_ras = in_ras,
              clear_map = reactive(input$clear), values = values)

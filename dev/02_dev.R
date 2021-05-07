@@ -28,6 +28,8 @@ usethis::use_package('lidR')
 usethis::use_package('sf')
 usethis::use_package('dashboardthemes')
 usethis::use_package('shinyalert')
+usethis::use_package('htmlwidgets')
+usethis::use_package('zip')
 
 ## Add modules ----
 ## Create a module infrastructure in R/
