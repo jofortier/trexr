@@ -22,7 +22,7 @@ mod_in_file_ui <- function(id){
 #'
 #' @noRd
 mod_in_file_server <- function(input, output, session, in_ras,HTboxI, file_path, clear_map, change_ht,
-                               input_box, feet, values){
+                               input_box, feet, values, switch_fil){
   ns <- session$ns
 
   observe({
@@ -33,10 +33,11 @@ mod_in_file_server <- function(input, output, session, in_ras,HTboxI, file_path,
 
   chmR<-raster::raster(inFile$datapath)
   chmR[chmR[]<0]<-0
-
-  input_box$box_og <- 0
-
   chmR[chmR[]<0] <- NA
+
+  input_box$box_og1 <- 0
+  input_box$box_og2 <- 500
+
 
   projecCHM <- raster::projection(chmR)
   in_ras$projectCHM <- projecCHM
@@ -80,11 +81,14 @@ if(feet()== 1){
 
   observeEvent(change_ht(),{
 
+
     if(is.null(in_ras$ras_crop)){
+
       chmR <- in_ras$chmR_og
+
     } else {
 
-      chmR <- in_ras$ras_crop
+      chmR <- in_ras$ras_crop_og
     }
 
     isolate({
@@ -94,7 +98,34 @@ if(feet()== 1){
 
     })
 
-    chmR[chmR[]<Htreshoud] <- NA
+
+    if(switch_fil() == 1){
+
+      chmR[chmR[]>Htreshoud[[1]] & chmR[]<Htreshoud[[2]]] <- NA
+
+    } else {
+
+       chmR[chmR[]<Htreshoud[[1]]] <- NA
+       chmR[chmR[]>Htreshoud[[2]]] <- NA
+    }
+
+if(raster::cellStats(chmR, mean) == 'NaN'){shinyalert::shinyalert(
+  title = "Filtering Error",
+  text = "You are trying to filter on data that's not there....",
+  size = "s",
+  closeOnEsc = TRUE,
+  closeOnClickOutside = TRUE,
+  html = FALSE,
+  type = "error",
+  showConfirmButton = TRUE,
+  showCancelButton = FALSE,
+  confirmButtonText = "OK",
+  confirmButtonCol = "#AEDEF4",
+  timer = 0,
+  imageUrl = "",
+  animation = TRUE)
+
+  } else {
 
     projecCHM <- raster::projection(chmR)
     in_ras$projectCHM <- projecCHM
@@ -122,7 +153,7 @@ if(is.null(in_ras$ras_crop)){
   in_ras$chmR_rec <- reactive(in_ras$ras_crop)
 
 }
-
+}
   })
 
 
@@ -137,11 +168,12 @@ if(is.null(in_ras$ras_crop)){
     isolate({
 
 
-      Htreshoud<-input_box$box_og
+      Htreshoud<-c(input_box$box_og1, input_box$box_og2)
 
     })
 
-    chmR[chmR[]<Htreshoud] <- NA
+    chmR[chmR[]<Htreshoud[[1]]] <- NA
+    chmR[chmR[]>Htreshoud[[2]]] <- NA
 
     projecCHM <- raster::projection(chmR)
     in_ras$projectCHM <- projecCHM

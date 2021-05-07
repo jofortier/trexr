@@ -22,6 +22,7 @@ app_server <- function( input, output, session ) {
   callModule(mod_in_file_server, "in_file_ui_1",
              in_ras = in_ras,
              feet = reactive(input$feet),
+             switch_fil = reactive(input$switch_fil),
              clear_map = reactive(input$clear),
              HTboxI = reactive(input$HTboxI),
              file_path = reactive(input$chm),
@@ -31,43 +32,48 @@ app_server <- function( input, output, session ) {
 
   observeEvent(input$clear,{
 
-    x <- input_box$box_og
+    min_fil <- input_box$box_og1
+    max_fil <- input_box$box_og2
 
-    updateNumericInput(session, 'HTboxI', value = x)
+    updateSliderInput(session, 'HTboxI', value = c(min_fil, max_fil))
 
   })
 
   observeEvent(input$feet,{
 
-    x <- input_box$box_og
 
-    updateNumericInput(session, 'HTboxI', value = x)
+    min_fil <- input_box$box_og1
+    max_fil <- input_box$box_og2
+
+    updateSliderInput(session, 'HTboxI', value = c(min_fil, max_fil))
 
   })
 
   observeEvent(input$clear,{
 
-    updateCheckboxInput(session, 'smooth3d', label = "Do you want to smooth 3d-plot?", value = FALSE)
-
+    updateCheckboxInput(session, 'smooth3d', label = "Smooth 3d-plot (focal mean)", value = FALSE)
+    updateCheckboxInput(session, 'switch_fil', label = 'Filter Outside Range', value = FALSE)
   })
 
   observeEvent(input$chm,{
 
-    updateCheckboxInput(session, 'smooth3d', label = "Do you want to smooth 3d-plot?", value = FALSE)
-
+    updateCheckboxInput(session, 'smooth3d', label = "Smooth 3d-plot (focal mean)", value = FALSE)
+    updateCheckboxInput(session, 'switch_fil', label = 'Filter Outside Range', value = FALSE)
   })
 
   observeEvent(input$feet,{
 
-    updateCheckboxInput(session, 'smooth3d', label = "Do you want to smooth 3d-plot?", value = FALSE)
-
+    updateCheckboxInput(session, 'smooth3d', label = "Smooth 3d-plot (focal mean)", value = FALSE)
+    updateCheckboxInput(session, 'switch_fil', label = 'Filter Outside Range', value = FALSE)
   })
 
   observeEvent(input$chm,{
 
-    x <- input_box$box_og
 
-    updateNumericInput(session, 'HTboxI', value = x)
+    min_fil <- input_box$box_og1
+    max_fil <- input_box$box_og2
+
+    updateSliderInput(session, 'HTboxI', value = c(min_fil, max_fil))
 
   })
 
@@ -92,7 +98,8 @@ app_server <- function( input, output, session ) {
     }
 
   })
-  callModule(mod_panel_leaflet_server, "panel_leaflet_ui_1", in_ras = in_ras, clear_map = reactive(input$clear), values = values)
+  callModule(mod_panel_leaflet_server, "panel_leaflet_ui_1", in_ras = in_ras,
+             clear_map = reactive(input$clear), values = values)
   callModule(mod_panel_plot_map_server, "panel_plot_map_ui_1", in_ras = in_ras)
   callModule(mod_panel_3d_server, "panel_3d_ui_1", in_ras = in_ras, clear_map = reactive(input$clear),
              sws = reactive(input$sws),

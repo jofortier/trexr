@@ -27,6 +27,7 @@ usethis::use_package('mapedit')
 usethis::use_package('lidR')
 usethis::use_package('sf')
 usethis::use_package('dashboardthemes')
+usethis::use_package('shinyalert')
 
 ## Add modules ----
 ## Create a module infrastructure in R/
@@ -37,13 +38,6 @@ golem::add_module( name = "panel_leaflet" )
 golem::add_module( name = "panel_3d" )
 golem::add_module(name = 'panel_plot_map')
 golem::add_module(name = 'panel_3d_big')
-# golem::add_module(name = 'cross_section')
-# golem::add_module(name = 'las_select')
-# golem::add_module(name = 'panel_tree_detection_stats')
-# golem::add_module(name = 'panel_tree_detection_stats_plot')
-# golem::add_module(name = 'panel_tree_detection_leaflet')
-# golem::add_module(name = 'panel_tree_detection_3d')
-# golem::add_module(name = 'trexr_logo')
 
 ## Add helper functions ----
 ## Creates ftc_* and utils_*
@@ -52,8 +46,6 @@ golem::add_utils( "helpers" )
 
 ## External resources
 ## Creates .js and .css files at inst/app/www
-golem::add_js_file( "script" )
-golem::add_js_handler( "handlers" )
 golem::add_css_file( "style" )
 
 ## Add internal datasets ----

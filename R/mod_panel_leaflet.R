@@ -29,6 +29,9 @@ mod_panel_leaflet_server <- function(input, output, session, in_ras, clear_map, 
 
 
  if(!is.null(in_ras$ras_crop)){
+
+
+
    myPal <- myColorRamp(c("blue","green","yellow","red"),0:255)
    val <- as.numeric(seq(raster::cellStats(in_ras$ras_crop, min), raster::cellStats(in_ras$ras_crop, max), 1))
 
@@ -41,7 +44,14 @@ mod_panel_leaflet_server <- function(input, output, session, in_ras, clear_map, 
                                                                                           "CartoDB.Positron",
                                                                                           "OpenStreetMap",
                                                                                           "CartoDB.DarkMatter",
-                                                                                          "OpenTopoMap"))
+                                                                                          "OpenTopoMap"))%>%
+     leaflet::addMeasure(
+       position = "topright",
+       primaryLengthUnit = "feet",
+       primaryAreaUnit = "acres",
+       activeColor = "#000000",
+       completedColor = "#FF0000"
+     )
 
  } else {
    myPal <- myColorRamp(c("blue","green","yellow","red"),0:255)
@@ -57,7 +67,14 @@ mod_panel_leaflet_server <- function(input, output, session, in_ras, clear_map, 
       leaflet::addLayersControl(overlayGroups = c('Raster', 'Hydrography'), baseGroups = c("Esri.WorldImagery",
                                                                                                                  "CartoDB.Positron",
                                                                                                                  "OpenStreetMap",
-                                                                                                                 "CartoDB.DarkMatter","OpenTopoMap"))
+                                                                                                                 "CartoDB.DarkMatter","OpenTopoMap"))%>%
+     leaflet::addMeasure(
+       position = "topright",
+       primaryLengthUnit = "feet",
+       primaryAreaUnit = "acres",
+       activeColor = "#000000",
+       completedColor = "#FF0000"
+     )
 
 
 
@@ -88,6 +105,8 @@ values$sf <- NULL
 
       ras_crop <- raster::mask(in_ras$chmR, bbox())
 
+      in_ras$ras_crop_og <- raster::mask(in_ras$chmR_og, bbox())
+
 intersection <- reactive(raster::intersect(raster::extent(in_ras$chmR), raster::extent(bbox())))
 
       if(is.null(intersection())) {
@@ -115,7 +134,14 @@ intersection <- reactive(raster::intersect(raster::extent(in_ras$chmR), raster::
                                                                                                  "CartoDB.Positron",
                                                                                                  "OpenStreetMap",
                                                                                                  "CartoDB.DarkMatter",
-                                                                                                 "OpenTopoMap"))
+                                                                                                 "OpenTopoMap")) %>%
+            leaflet::addMeasure(
+              position = "topright",
+              primaryLengthUnit = "feet",
+              primaryAreaUnit = "acres",
+              activeColor = "#000000",
+              completedColor = "#FF0000"
+            )
 
         })
 
@@ -150,7 +176,14 @@ intersection <- reactive(raster::intersect(raster::extent(in_ras$chmR), raster::
                                                                                                "CartoDB.Positron",
                                                                                                "OpenStreetMap",
                                                                                                "CartoDB.DarkMatter",
-                                                                                               "OpenTopoMap"))
+                                                                                               "OpenTopoMap"))%>%
+          leaflet::addMeasure(
+            position = "topright",
+            primaryLengthUnit = "feet",
+            primaryAreaUnit = "acres",
+            activeColor = "#000000",
+            completedColor = "#FF0000"
+          )
 
 
 

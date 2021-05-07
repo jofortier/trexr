@@ -29,15 +29,19 @@ app_ui <- function(request) {
                                        conditionalPanel(condition = "input.menu1 === 'chm_cp'",
                                                         fileInput("chm", "Please Select File",
                                                                   accept = c('.tif', '.asc', '.img')),
-                                                        numericInput('HTboxI', "Please Enter a Tree Height", value = 0,
-                                                                     min = 0, max = 255),
-                                                        checkboxInput("feet", "Do you want to change meters (Z) to feet?",
+                                                                         tags$div(class = 'slider-mar',sliderInput("HTboxI",
+                                                                    label = "Filter Canopy Height Range:",
+                                                                    min = 0, max = 300, value = c(0, 300), sep = "")),
+                                                       tags$div(class= "checkbox-filter",checkboxInput('switch_fil', label = 'Filter Outside Range',
+                                                                     value = FALSE)),
+                                                       checkboxInput("feet", "Convert Z-values from Meters to Feet",
                                                                       value = FALSE),
-                                                                             checkboxInput("smooth3d", "Do you want to smooth 3d-plot?",
+                                                                             checkboxInput("smooth3d",label =  "Smooth 3d-plot (focal mean)",
                                                                                            value = FALSE),
+
                                                                          conditionalPanel(condition="input.smooth3d=='1'",
 
-                                                                                              selectInput("sws", "Pick a window size.",
+                                                                                              selectInput("sws", "Focal Size",
                                                                                                           choices = c("3x3","5x5","7x7","9x9"),selected="3x3")),
                                                         div(style="display:inline-block;width:32%;text-align: center;",actionButton('clear', "Fresh Start")),
                                                             div(style="display:inline-block;width:32%;text-align: center;",
@@ -95,9 +99,11 @@ golem_add_external_resources <- function(){
     bundle_resources(
       path = app_sys('app/www'),
       app_title = 'trexr'
-    )
+    ),
+    shinyalert::useShinyalert()
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert()
   )
+
 }
 

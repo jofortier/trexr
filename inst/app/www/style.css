@@ -21,3 +21,36 @@
   padding-left: 6px;
   padding-right: 6px;
 }
+
+
+.js-irs-0 .irs-bar {
+background: #2CDEEB;
+border-color: #2CDEEB;
+}
+
+.js-irs-0 .irs-from {
+background: #2CDEEB;
+border-color: #000000;
+color: #000000;
+}
+
+.js-irs-0 .irs-to {
+background: #2CDEEB;
+border-color: #000000;
+color: #000000;
+}
+.js-irs-0 .irs-single {
+background: #2CDEEB;
+border-color: #000000;
+color: #000000;
+}
+.checkbox-filter {
+        margin: 0;
+}
+.shiny-input-container {margin-bottom: 0;}
+.checkbox {margin: 0}
+        .checkbox p {margin: 0;}
+
+.hidden-xs {
+  color: #000000;
+}
