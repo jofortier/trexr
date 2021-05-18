@@ -19,7 +19,7 @@ mod_panel_stats_ui <- function(id){
 #' panel_stats Server Function
 #'
 #' @noRd
-mod_panel_stats_server <- function(input, output, session, in_ras, clear_map){
+mod_panel_stats_server <- function(input, output, session, in_ras, clear_map, values){
   ns <- session$ns
 
 
@@ -27,26 +27,22 @@ mod_panel_stats_server <- function(input, output, session, in_ras, clear_map){
 
     if(is.null(in_ras$ras_crop)){
 
-
   in_ras$area_ha <- (raster::ncell(in_ras$chmR)*raster::res(in_ras$chmR)[1]^2)/10000
   chm_hts<-in_ras$chmR[!is.na(in_ras$chmR)]
 
   output$summary <- shiny::renderTable({
-    validate(need(!is.null(in_ras$chmR), 'Waiting for Raster'))
-
-
 
     NameExp<-c("Area (acres)","Hmax","Hmean","Hmin","Hmedian","Hvar","Hsd","Hcv","Hkurtosis","Hskewness")
     MetricsExp<-c(round(in_ras$area_ha*2.47105,digits=2),
-                  round(max(chm_hts),digits=2),
-                  round(mean(chm_hts),digits=2),
-                  round(min(chm_hts),digits=2),
-                  round(median(chm_hts),digits=2),
-                  round(var(chm_hts),digits=2),
-                  round(sd(chm_hts),digits=2),
-                  round(cv(chm_hts),digits=2),
-                  round(kurtosis(chm_hts),digits=2),
-                  round(skewness(chm_hts),digits=2))
+                  paste0(round(max(chm_hts),digits=2), ' ', values$data_stat),
+                  paste0(round(mean(chm_hts),digits=2), ' ', values$data_stat),
+                  paste0(round(min(chm_hts),digits=2), ' ', values$data_stat),
+                  paste0(round(median(chm_hts),digits=2), ' ', values$data_stat),
+                  paste0(round(var(chm_hts),digits=2), ' ', values$data_stat),
+                  paste0(round(sd(chm_hts),digits=2), ' ',values$data_stat),
+                  paste0(round(cv(chm_hts),digits=2), ' ', values$data_stats),
+                  paste0(round(kurtosis(chm_hts),digits=2), ' ', values$data_stat),
+                  paste0(round(skewness(chm_hts),digits=2),' ', values$data_stat))
 
     LiDARsummary0<-data.frame(cbind(NameExp,MetricsExp))
     colnames(LiDARsummary0)<-c("Parameters", "Value")
@@ -64,15 +60,15 @@ mod_panel_stats_server <- function(input, output, session, in_ras, clear_map){
 
         NameExp<-c("Area (acres)","Hmax","Hmean","Hmin","Hmedian","Hvar","Hsd","Hcv","Hkurtosis","Hskewness")
         MetricsExp<-c(round(in_ras$area_ha*2.47105,digits=2),
-                      round(max(chm_hts),digits=2),
-                      round(mean(chm_hts),digits=2),
-                      round(min(chm_hts),digits=2),
-                      round(median(chm_hts),digits=2),
-                      round(var(chm_hts),digits=2),
-                      round(sd(chm_hts),digits=2),
-                      round(cv(chm_hts),digits=2),
-                      round(kurtosis(chm_hts),digits=2),
-                      round(skewness(chm_hts),digits=2))
+                      paste0(round(max(chm_hts),digits=2), ' ', values$data_stat),
+                      paste0(round(mean(chm_hts),digits=2), ' ', values$data_stat),
+                      paste0(round(min(chm_hts),digits=2), ' ', values$data_stat),
+                      paste0(round(median(chm_hts),digits=2), ' ', values$data_stat),
+                      paste0(round(var(chm_hts),digits=2), ' ', values$data_stat),
+                      paste0(round(sd(chm_hts),digits=2), ' ',values$data_stat),
+                      paste0(round(cv(chm_hts),digits=2), ' ', values$data_stats),
+                      paste0(round(kurtosis(chm_hts),digits=2), ' ', values$data_stat),
+                      paste0(round(skewness(chm_hts),digits=2),' ', values$data_stat))
 
         LiDARsummary0<-data.frame(cbind(NameExp,MetricsExp))
         colnames(LiDARsummary0)<-c("Parameters", "Value")
@@ -94,15 +90,15 @@ mod_panel_stats_server <- function(input, output, session, in_ras, clear_map){
 
       NameExp<-c("Area (acres)","Hmax","Hmean","Hmin","Hmedian","Hvar","Hsd","Hcv","Hkurtosis","Hskewness")
       MetricsExp<-c(round(in_ras$area_ha*2.47105,digits=2),
-                    round(max(chm_hts),digits=2),
-                    round(mean(chm_hts),digits=2),
-                    round(min(chm_hts),digits=2),
-                    round(median(chm_hts),digits=2),
-                    round(var(chm_hts),digits=2),
-                    round(sd(chm_hts),digits=2),
-                    round(cv(chm_hts),digits=2),
-                    round(kurtosis(chm_hts),digits=2),
-                    round(skewness(chm_hts),digits=2))
+                    paste0(round(max(chm_hts),digits=2), ' ', values$data_stat),
+                    paste0(round(mean(chm_hts),digits=2), ' ', values$data_stat),
+                    paste0(round(min(chm_hts),digits=2), ' ', values$data_stat),
+                    paste0(round(median(chm_hts),digits=2), ' ', values$data_stat),
+                    paste0(round(var(chm_hts),digits=2), ' ', values$data_stat),
+                    paste0(round(sd(chm_hts),digits=2), ' ',values$data_stat),
+                    paste0(round(cv(chm_hts),digits=2), ' ', values$data_stats),
+                    paste0(round(kurtosis(chm_hts),digits=2), ' ', values$data_stat),
+                    paste0(round(skewness(chm_hts),digits=2),' ', values$data_stat))
 
       LiDARsummary0<-data.frame(cbind(NameExp,MetricsExp))
       colnames(LiDARsummary0)<-c("Parameters", "Value")

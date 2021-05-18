@@ -215,3 +215,37 @@ myColorRamp <- function(colors, values) {
   grDevices::rgb(x[,1], x[,2], x[,3], maxColorValue = 255)
 }
 
+
+dataModal <- function(failed = FALSE) {
+
+  jscode <- '
+$(function() {
+  var $els = $("[data-proxy-click]");
+  $.each(
+    $els,
+    function(idx, el) {
+      var $el = $(el);
+      var $proxy = $("#" + $el.data("proxyClick"));
+      $el.keydown(function (e) {
+        if (e.keyCode == 13) {
+          $proxy.click();
+        }
+      });
+    }
+  );
+});
+'
+  modalDialog(
+    tags$head(tags$script(HTML(jscode))),
+    div(tagAppendAttributes(textInput("zvalues", "Indicate your input Z value, please.",
+              placeholder = 'Try "feet" or "meters"'
+    ),`data-proxy-click` = "ok")),
+
+    if (failed)
+      div(tags$b("Invalid unit!", style = "color: red;")),
+
+    footer = tagList(
+    actionButton("ok", "OK")
+  )
+  )
+}

@@ -8,16 +8,22 @@ app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
-
     # List the first level UI elements here
 
     shinydashboard::dashboardPage(
-      shinydashboardPlus::dashboardHeader(title = 'trexr (Tree Exploration in R)',titleWidth = 300,
-                                          shinydashboardPlus::userOutput('trexr')
+      shinydashboardPlus::dashboardHeader(
+                                          titleWidth = 300,
+                                          shinydashboardPlus::userOutput('trexr'),
+                                          title = dashboardthemes::shinyDashboardLogo(
+                                            theme = "blue_gradient",
+                                            boldText = "trexr",
+                                            mainText = "(App)",
+                                            badgeText = "v0.1"
+                                          )
                                       ),
 
-      shinydashboard::dashboardSidebar(width = 300,dashboardthemes::shinyDashboardThemes(
-        theme = "blue_gradient"),
+      shinydashboard::dashboardSidebar(width = 300,
+                               dashboardthemes::shinyDashboardThemes(theme = "blue_gradient"),
 
                                        shinydashboard::sidebarMenu(id = 'menu1',
 
@@ -29,35 +35,47 @@ app_ui <- function(request) {
                                        conditionalPanel(condition = "input.menu1 === 'chm_cp'",
                                                         fileInput("chm", "Please Select File",
                                                                   accept = c('.tif', '.asc', '.img')),
+
                                                                          tags$div(class = 'slider-mar',sliderInput("HTboxI",
                                                                     label = "Filter Canopy Height Range:",
                                                                     min = 0, max = 300, value = c(0, 300), sep = "")),
-                                                       tags$div(class= "checkbox-filter",checkboxInput('switch_fil', label = 'Filter Outside Range',
+                                                       tags$div(class= "checkbox-filter",
+                                                                checkboxInput('switch_fil', label = 'Filter Outside Range',
+                                                                     value = FALSE)),     tags$div(class= "checkbox-filter",checkboxInput("zvalues", "Define Z-values",
                                                                      value = FALSE)),
-                                                       checkboxInput("feet", "Convert Z-values from Meters to Feet",
+                                                        conditionalPanel(condition = "input.zvalues=='1'",
+                                                                         radioButtons('lab_sel', 'Label (graphs & stats)', choices = c('Z', 'Feet', 'Meters'), selected = 'Z',
+                                                                                      inline = TRUE),
+                                                                         selectInput('zsel', 'Z value', choices = c('feet', 'meters')),
+                                                                         conditionalPanel(condition = "input.zsel==='feet'",
+                                                                                          checkboxInput("feet", "Convert Z-values from Feet to Meters",
+                                                                                                        value = FALSE)),
+                                                                         conditionalPanel(condition = "input.zsel==='meters'",
+                                                                                          checkboxInput("met", "Convert Z-values from Meters to Feet",
+                                                                                                        value = FALSE))
+                                                        ),
+                                                        checkboxInput("smooth3d",label =  "Smooth 3d-plot (focal mean)",
                                                                       value = FALSE),
-                                                                             checkboxInput("smooth3d",label =  "Smooth 3d-plot (focal mean)",
-                                                                                           value = FALSE),
 
                                                                          conditionalPanel(condition="input.smooth3d=='1'",
-
                                                                                               selectInput("sws", "Focal Size",
                                                                                                           choices = c("3x3","5x5","7x7","9x9"),selected="3x3")),
                                                         div(style="display:inline-block;width:32%;text-align: center;",actionButton('clear', "Fresh Start")),
                                                             div(style="display:inline-block;width:32%;text-align: center;",
-                                                                actionButton('change_ht', 'Run (change height)')),
-                                                       checkboxInput('dwnshps', 'Download Finished Measurements?', value = FALSE),
-                                                       conditionalPanel(condition = "input.dwnshps=='1'",
-                                                                            textInput('export_filename', label = 'Filename'),
-                                                                        selectInput('export_format', 'Select Format', choices = c("shp", "kml")),
-
-                                                                                downloadButton("downloadData", label = "Download",
-                                                                                               class = 'butt1'))),
+                                                                actionButton('change_ht', 'Run (change height)'))
+                                                       ),
                                        shinydashboard::menuItem(
                                          "About",
                                          tabName = "get_started",
                                          icon = icon("door-open")
-                                       ))),
+                                       )),br(),
+                               tags$head(tags$style("
+                                   .center-usda {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}")), div(img(src="www/usda_usfs2.png", class = 'center-usda', height="150%", width="150%", align='center'))),
 
       shinydashboard::dashboardBody(tags$head(
         tags$link(rel = "shortcut icon", href = "hex-trexr.png")),
@@ -66,6 +84,15 @@ app_ui <- function(request) {
         tabName = "get_started"),
 
       shinydashboard::tabItem(
+        tags$head(tags$style("
+                             .shiny-notification {
+             margin-left: -10px !important;
+             height: 40px !important;
+             border-color: black;
+             }
+             ")),
+        tags$head(tags$style(".modal-dialog{ width:350px}")),
+        tags$head(tags$style(".modal-body{ min-height:25px}")),
         tabName = "chm_cp",
         fluidRow(
           shinydashboard::tabBox(width = 12, id = 'tabchart',

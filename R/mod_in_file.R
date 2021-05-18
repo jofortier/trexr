@@ -22,10 +22,11 @@ mod_in_file_ui <- function(id){
 #'
 #' @noRd
 mod_in_file_server <- function(input, output, session, in_ras,HTboxI, file_path, clear_map, change_ht,
-                               input_box, feet, values, switch_fil){
+                               input_box, feet, values, switch_fil, zvalues, zsel, met, lab_sel){
   ns <- session$ns
 
-  observe({
+
+  observeEvent(file_path(), {
 
   inFile<- file_path()
   if (is.null(inFile)){
@@ -50,9 +51,51 @@ mod_in_file_server <- function(input, output, session, in_ras,HTboxI, file_path,
                          colNotNA[1], colNotNA[length(colNotNA)])
   chmR <- raster::crop(chmR,exst)
 
-if(feet()== 1){
+  showNotification(ui = "uploaded raster")
 
-  chmR <- chmR*3.28084
+  req(chmR)
+
+  in_ras$chmR <- chmR
+
+  in_ras$chmR_og <- chmR
+
+  in_ras$chmR_og_og <- chmR
+
+  in_ras$chmR_rec <- reactive(in_ras$chmR)
+
+  in_ras$ras_crop <- NULL
+
+  values$sf <- NULL
+  observe({
+  if(lab_sel() == 'Z'){
+
+    values$data <- 'Z'
+    values$data_stat <- ''
+  } else if (lab_sel() == 'Feet') {
+
+    values$data <- 'Feet'
+    values$data_stat <- 'ft'
+
+  } else if (lab_sel() == 'Meters'){
+
+    values$data <- 'Meters'
+    values$data_stat <- 'm'
+  }
+})
+  })
+observeEvent(feet(), {
+
+  req(in_ras$chmR_og)
+
+isolate({
+if(feet()== 1){
+req(in_ras$chmR_og)
+
+  chmR <- in_ras$chmR_og_og
+
+  showNotification(ui = "converting Z values to meters")
+
+  chmR <- chmR/3.28084
 
   in_ras$chmR <- chmR
 
@@ -64,7 +107,13 @@ if(feet()== 1){
 
   values$sf <- NULL
 
-} else {
+} else if (feet()==0){
+
+  showNotification(ui = "converting Z values back to feet")
+
+  chmR <- in_ras$chmR_og_og
+
+  req(chmR)
 
   in_ras$chmR <- chmR
 
@@ -76,11 +125,57 @@ if(feet()== 1){
 
   values$sf <- NULL
 }
+})
+})
+
+observeEvent(met(), {
+  req(in_ras$chmR_og)
+  isolate({
+  if(met()== 1){
+
+  chmR <- in_ras$chmR_og_og
+
+    req(chmR)
+
+    showNotification(ui = "converting Z values to feet")
+
+    chmR <- chmR*3.28084
+
+    in_ras$chmR <- chmR
+
+    in_ras$chmR_og <- chmR
+
+    in_ras$chmR_rec <- reactive(in_ras$chmR)
+
+    in_ras$ras_crop <- NULL
+
+    values$sf <- NULL
+
+  } else if (met() == 0){
+
+    showNotification(ui = "converting Z values back to meters")
+
+    chmR <- in_ras$chmR_og_og
+    req(chmR)
+
+    in_ras$chmR <- chmR
+
+    in_ras$chmR_og <- chmR
+
+    in_ras$chmR_rec <- reactive(in_ras$chmR)
+
+    in_ras$ras_crop <- NULL
+
+    values$sf <- NULL
+  }
+
+    })
   })
 
 
   observeEvent(change_ht(),{
 
+    req(in_ras$chmR_og)
 
     if(is.null(in_ras$ras_crop)){
 
@@ -98,17 +193,21 @@ if(feet()== 1){
 
     })
 
-
+    isolate({
     if(switch_fil() == 1){
+
+      showNotification(ui = "changing height 'outside'")
 
       chmR[chmR[]>Htreshoud[[1]] & chmR[]<Htreshoud[[2]]] <- NA
 
     } else {
 
+      showNotification(ui = "changing height")
+
        chmR[chmR[]<Htreshoud[[1]]] <- NA
        chmR[chmR[]>Htreshoud[[2]]] <- NA
     }
-
+})
 if(raster::cellStats(chmR, mean) == 'NaN'){shinyalert::shinyalert(
   title = "Filtering Error",
   text = "No canopy values found within the defined height range.",
@@ -126,9 +225,9 @@ if(raster::cellStats(chmR, mean) == 'NaN'){shinyalert::shinyalert(
   animation = TRUE)
 
   } else {
-
-    projecCHM <- raster::projection(chmR)
-    in_ras$projectCHM <- projecCHM
+#
+#     projecCHM <- raster::projection(chmR)
+#     in_ras$projectCHM <- projecCHM
     area_ha<-0
     reschmR<-raster::res(chmR)[1]
     newst<-raster::extent(chmR)
@@ -161,6 +260,9 @@ if(is.null(in_ras$ras_crop)){
 
   observeEvent(clear_map(),{
 
+    req(in_ras$chmR_og)
+    showNotification(ui = "refreshing back to original")
+
     in_ras$ras_crop <- NULL
 
     chmR <- in_ras$chmR_og
@@ -175,8 +277,8 @@ if(is.null(in_ras$ras_crop)){
     chmR[chmR[]<Htreshoud[[1]]] <- NA
     chmR[chmR[]>Htreshoud[[2]]] <- NA
 
-    projecCHM <- raster::projection(chmR)
-    in_ras$projectCHM <- projecCHM
+    # projecCHM <- raster::projection(chmR)
+    # in_ras$projectCHM <- projecCHM
     area_ha<-0
     reschmR<-raster::res(chmR)[1]
     newst<-raster::extent(chmR)
@@ -192,6 +294,7 @@ if(is.null(in_ras$ras_crop)){
     in_ras$chmR <- chmR
 
     in_ras$chmR_rec <- reactive(in_ras$chmR)
+
 
   })
 

@@ -21,14 +21,21 @@ mod_panel_leaflet_ui <- function(id){
 #'
 #' @noRd
 mod_panel_leaflet_server <- function(input, output, session, in_ras, clear_map, values){
-  ns <- session$ns
 
-  observeEvent(in_ras$chmR_rec, {
-  output$leaf_map <- leaflet::renderLeaflet({
-   validate(need(!is.null(in_ras$chmR), 'Waiting for Raster'))
+   ns <- session$ns
+
+   observeEvent(in_ras$chmR_rec, {
+
+   req(in_ras$chmR)
+
+   output$leaf_map <- leaflet::renderLeaflet({
 
 
- if(!is.null(in_ras$ras_crop)){
+
+    showNotification(ui = "loading map...")
+
+isolate({
+   if(!is.null(in_ras$ras_crop)){
 
 
 
@@ -38,7 +45,7 @@ mod_panel_leaflet_server <- function(input, output, session, in_ras, clear_map, 
    pal = leaflet::colorNumeric(myPal, val,
                                na.color = "transparent")
 
-   base_map() %>% leaflet::addRasterImage(x = in_ras$ras_crop, group = 'Raster', colors = pal) %>%
+  base_map() %>% leaflet::addRasterImage(x = in_ras$ras_crop, group = 'Raster', colors = pal) %>%
      leaflet::addLegend(pal = pal, values = val, position = "bottomright") %>%
      leaflet::addLayersControl(overlayGroups = c('Raster', 'Hydrography'), baseGroups = c("Esri.WorldImagery",
                                                                                           "CartoDB.Positron",
@@ -61,12 +68,15 @@ mod_panel_leaflet_server <- function(input, output, session, in_ras, clear_map, 
             })
         }")
 
- } else {
+
+
+   } else {
+
    myPal <- myColorRamp(c("blue","green","yellow","red"),0:255)
    val <- as.numeric(seq(raster::cellStats(in_ras$chmR, min), raster::cellStats(in_ras$chmR, max), 1))
    pal = leaflet::colorNumeric(myPal, val,
                                na.color = "transparent")
-   base_map() %>% leaflet::addRasterImage(x = in_ras$chmR, group = 'Raster', colors = pal) %>%
+    base_map() %>% leaflet::addRasterImage(x = in_ras$chmR, group = 'Raster', colors = pal) %>%
       leaflet::addLegend(pal = pal, values = val, position = "bottomright") %>%
       leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F,circleMarkerOptions = F,
                                      rectangleOptions = leaflet.extras::drawRectangleOptions(repeatMode = TRUE),
@@ -92,22 +102,19 @@ mod_panel_leaflet_server <- function(input, output, session, in_ras, clear_map, 
             })
         }")
 
+   }
 
-
- }
-
-
-})
-
+ })
 
 })
 
+   })
 
   #update map with user input
   shiny::observeEvent(input$leaf_map_draw_new_feature, {
 
 
-values$sf <- NULL
+  values$sf <- NULL
 
   values$sf <- sf::st_sf(sf::st_sfc(crs = 4326))
 
@@ -119,17 +126,17 @@ values$sf <- NULL
       new_sf <- isolate(sf::st_sf(geometry = sf::st_sfc(sf::st_polygon(list(coords))), crs = sf::st_crs(4326)) %>% sf::st_as_sf())
       shiny::isolate(values$sf <- rbind(values$sf, new_sf))
 
-      bbox <- shiny::reactive(values$sf %>% sf::st_transform(crs = raster::crs(in_ras$chmR)))
+      bbox <- values$sf %>% sf::st_transform(crs = raster::crs(in_ras$chmR))
 
-      sf_pt <- reactive(sf::st_centroid(values$sf))
+      sf_pt <- sf::st_centroid(values$sf)
 
-      ras_crop <- raster::mask(in_ras$chmR, bbox())
+      ras_crop <- raster::mask(in_ras$chmR, bbox)
 
-      in_ras$ras_crop_og <- raster::mask(in_ras$chmR_og, bbox())
+      in_ras$ras_crop_og <- raster::mask(in_ras$chmR_og, bbox)
 
-intersection <- reactive(raster::intersect(raster::extent(in_ras$chmR), raster::extent(bbox())))
+  intersection <- raster::intersect(raster::extent(in_ras$chmR), raster::extent(bbox))
 
-      if(is.null(intersection())) {
+      if(is.null(intersection)) {
 
         output$leaf_map <- leaflet::renderLeaflet({
 
@@ -143,7 +150,7 @@ intersection <- reactive(raster::intersect(raster::extent(in_ras$chmR), raster::
 
           base_map() %>%
             leaflet::addRasterImage(x = in_ras$chmR, group = 'Raster', colors = myPal) %>%
-            leaflet::addPopups(sf_pt()[[1]][[1]][[1]], sf_pt()[[1]][[1]][[2]], 'Please select within the raster area!',
+            leaflet::addPopups(sf_pt[[1]][[1]][[1]], sf_pt[[1]][[1]][[2]], 'Please select within the raster area!',
                       options = leaflet::popupOptions(closeButton = TRUE)
             ) %>%
             leaflet.extras::addDrawToolbar(polylineOptions = F, circleOptions = F,circleMarkerOptions = F,
@@ -175,10 +182,7 @@ intersection <- reactive(raster::intersect(raster::extent(in_ras$chmR), raster::
 
 
       } else {
-
-
-
-
+        isolate({
       output$leaf_map <- leaflet::renderLeaflet({
 
 
@@ -226,9 +230,10 @@ intersection <- reactive(raster::intersect(raster::extent(in_ras$chmR), raster::
       })
 
       in_ras$rec_feat <- reactive(input$leaf_map_draw_new_feature)
-}
-    })
+})
+      }
 
+ })
 
 }
 

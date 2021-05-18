@@ -44,19 +44,11 @@ background: #2CDEEB;
 border-color: #000000;
 color: #000000;
 }
+
 .checkbox-filter {
         margin: 0;
 }
-.shiny-input-container {margin-bottom: 0;}
+
 .checkbox {margin: 0}
         .checkbox p {margin: 0;}
 
-.butt1  {
-      background-color:rgba(0,0,0,0);
-      color: black;
-      font-family: Courier New;
-      border-color: #ddd;
-      -webkit-box-shadow: 0px;
-      box-shadow: 0px;
-      opacity: 1;
-    }
