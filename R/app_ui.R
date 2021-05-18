@@ -35,14 +35,21 @@ app_ui <- function(request) {
                                        conditionalPanel(condition = "input.menu1 === 'chm_cp'",
                                                         fileInput("chm", "Please Select File",
                                                                   accept = c('.tif', '.asc', '.img')),
-
-                                                                         tags$div(class = 'slider-mar',sliderInput("HTboxI",
+                                                        div(style = "padding: 14px 14px; margin-top:-2.5em",
+                                                            fluidRow(sliderInput("HTboxI",
                                                                     label = "Filter Canopy Height Range:",
-                                                                    min = 0, max = 300, value = c(0, 300), sep = "")),
-                                                       tags$div(class= "checkbox-filter",
+                                                                    min = 0, max = 300, value = c(0, 300), sep = ""))),
+                                                        tags$head(
+                                                          tags$style(HTML(
+                                                            ".checkbox {margin: 0}
+        .checkbox p {margin: 0;}
+        .shiny-input-container {margin-bottom: 0;
+                                margin-top: 0;}
+       "
+                                                          ))),
                                                                 checkboxInput('switch_fil', label = 'Filter Outside Range',
                                                                      value = FALSE)),     tags$div(class= "checkbox-filter",checkboxInput("zvalues", "Define Z-values",
-                                                                     value = FALSE)),
+                                                                     value = FALSE),
                                                         conditionalPanel(condition = "input.zvalues=='1'",
                                                                          radioButtons('lab_sel', 'Label (graphs & stats)', choices = c('Z', 'Feet', 'Meters'), selected = 'Z',
                                                                                       inline = TRUE),
@@ -110,7 +117,7 @@ app_ui <- function(request) {
 
     )
   )
-    )
+)
 ) #end tagList
 }
 

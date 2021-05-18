@@ -45,10 +45,16 @@ border-color: #000000;
 color: #000000;
 }
 
+
 .checkbox-filter {
         margin: 0;
 }
 
 .checkbox {margin: 0}
-        .checkbox p {margin: 0;}
 
+.checkbox p {margin: 0;}
+
+.shiny-input-container {margin-bottom: 0;}
+
+.file-input {margin-bottom: 0;
+                        margin-top: 0;}

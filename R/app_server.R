@@ -66,12 +66,7 @@ app_server <- function( input, output, session ) {
 
     updateCheckboxInput(session, 'smooth3d', label = "Smooth 3d-plot (focal mean)", value = FALSE)
     updateCheckboxInput(session, 'switch_fil', label = 'Filter Outside Range', value = FALSE)
-    updateCheckboxInput(session, "feet", "Convert Z-values from Feet to Meters",
-                        value = FALSE)
-    updateCheckboxInput(session, "met", "Convert Z-values from Meters to Feet",
-                        value = FALSE)
-    updateRadioButtons(session, 'lab_sel', 'Label (graphs & stats)', choices = c('Z', 'Feet', 'Meters'), selected = 'Z',
-                       inline = TRUE)
+
   })
 
   observeEvent(input$feet,{
