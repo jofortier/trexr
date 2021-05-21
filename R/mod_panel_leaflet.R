@@ -20,7 +20,7 @@ mod_panel_leaflet_ui <- function(id){
 #' panel_leaflet Server Function
 #'
 #' @noRd
-mod_panel_leaflet_server <- function(input, output, session, in_ras, clear_map, values){
+mod_panel_leaflet_server <- function(input, output, session, in_ras, clear_map, values, shape, clip){
 
    ns <- session$ns
 
@@ -58,20 +58,11 @@ isolate({
        primaryAreaUnit = "acres",
        activeColor = "#000000",
        completedColor = "#FF0000"
-     )%>%
-     htmlwidgets::onRender("
-        function(el, x) {
-          var myMap = this;
-          myMap.on('measurefinish',
-            function (e) {
-              Shiny.onInputChange('selectedPoints', e.points);
-            })
-        }")
-
+     )
 
 
    } else {
-
+print('im here')
    myPal <- myColorRamp(c("blue","green","yellow","red"),0:255)
    val <- as.numeric(seq(raster::cellStats(in_ras$chmR, min), raster::cellStats(in_ras$chmR, max), 1))
    pal = leaflet::colorNumeric(myPal, val,
@@ -91,16 +82,38 @@ isolate({
        primaryLengthUnit = "feet",
        primaryAreaUnit = "acres",
        activeColor = "#000000",
-       completedColor = "#FF0000"
-     ) %>%
-     htmlwidgets::onRender("
-        function(el, x) {
-          var myMap = this;
-          myMap.on('measurefinish',
-            function (e) {
-              Shiny.onInputChange('selectedPoints', e.points);
-            })
-        }")
+       completedColor = "#FF0000") %>%
+      leaflet::addControl(html = actionButton('crop', 'crop')) %>%
+      leaflet::addControl(html = actionButton('shape', 'add shapefile'))
+     # ) %>% leaflet::addEasyButton(
+     #   leaflet::easyButton(id = 'edit-btn',
+     #              states = list(
+     #                leaflet::easyButtonState(
+     #                  stateName = 'add-toolbar',
+     #                  icon = icon('toggle-off'),
+     #                  title = 'Edit',
+     #                  onClick = htmlwidgets::JS("
+     #      function(btn, map) {
+     #        Shiny.onInputChange('edit_btn', 'TRUE');
+     #        btn.state('remove-toolbar');
+     #      }"
+     #                  )
+     #                ),
+     #      leaflet::easyButtonState(
+     #        stateName = 'remove-toolbar',
+     #        icon = icon('toggle-on'),
+     #        title = 'Editing',
+     #        onClick = htmlwidgets::JS("
+     #      function(btn, map) {
+     #        Shiny.onInputChange('edit_btn', 'FALSE');
+     #        btn.state('add-toolbar');
+     #      }"
+     #        )
+     #      ))
+     #   )
+     # )
+
+
 
    }
 
@@ -108,23 +121,89 @@ isolate({
 
 })
 
-   })
+
+
+
+ })
+
+
+   observe({
+leaf_prox <- leaflet::leafletProxy('leaf_map')
+# req(!is.null(shape$dat))
+
+if(class(shape$dat)[[1]] %in% "SpatialPolygonsDataFrame") {
+  print('hello')
+     leaf_prox %>% leaflet::addPolygons(data = shape$dat, group = 'user_shape') %>%
+    leaflet::addLayersControl(overlayGroups = c('Raster', 'Hydrography','user_shape'), baseGroups = c("Esri.WorldImagery",
+                                                                                         "CartoDB.Positron",
+                                                                                         "OpenStreetMap",
+                                                                                         "CartoDB.DarkMatter",
+                                                                                         "OpenTopoMap"))
+
+} else if (class(shape$dat)[[1]] %in% 'SpatialPointsDataFrame'){
+
+  leaf_prox %>% leaflet::addMarkers(data = shape$dat, group = 'user_shape') %>%
+    leaflet::addLayersControl(overlayGroups = c('Raster', 'Hydrography','user_shape'), baseGroups = c("Esri.WorldImagery",
+                                                                                                      "CartoDB.Positron",
+                                                                                                      "OpenStreetMap",
+                                                                                                      "CartoDB.DarkMatter",
+                                                                                                      "OpenTopoMap"))
+
+} else if (class(shape$dat)[[1]] %in% 'SpatialLinesDataFrame'){
+
+  leaf_prox %>% leaflet::addPolylines(data = shape$dat, group = 'user_shape') %>%
+    leaflet::addLayersControl(overlayGroups = c('Raster', 'Hydrography','user_shape'), baseGroups = c("Esri.WorldImagery",
+                                                                                                      "CartoDB.Positron",
+                                                                                                      "OpenStreetMap",
+                                                                                                      "CartoDB.DarkMatter",
+                                                                                                      "OpenTopoMap"))
+
+    }
+})
+
+
 
   #update map with user input
-  shiny::observeEvent(input$leaf_map_draw_new_feature, {
+  shiny::observeEvent(clip(), {
 
+    req(!is.null(input$leaf_map_draw_all_features))
 
   values$sf <- NULL
 
   values$sf <- sf::st_sf(sf::st_sfc(crs = 4326))
 
-    feat <- input$leaf_map_draw_new_feature
-    coords <- unlist(feat$geometry$coordinates)
+    feat <- input$leaf_map_draw_all_features
+
+    if(feat$type %in% 'FeatureCollection'){
+
+      sf_list <- list()
+      for(i in 1:length(feat$features)){
+        coords <- unlist(feat$features[[i]]$geometry$coordinates)
+      coords <- matrix(coords, ncol = 2, byrow = T)
+
+      new_sf <- isolate(sf::st_sf(geometry = sf::st_sfc(sf::st_polygon(list(coords))), crs = sf::st_crs(4326)) %>% sf::st_as_sf())
+
+      sf_list <- append(sf_list, new_sf)
+
+      }
+
+      new_sf <- do.call(rbind, sf_list)
+      rownames(new_sf) <- NULL
+      new_sf <- new_sf %>% data.frame() %>% sf::st_as_sf() %>% sf::st_set_crs(4326) %>%  sf::st_transform(4326)
+      shiny::isolate(values$sf <- rbind(values$sf, new_sf))
+
+    } else {
+
+        coords <- unlist(feat$geometry$coordinates)
     coords <- matrix(coords, ncol = 2, byrow = T)
 
 
       new_sf <- isolate(sf::st_sf(geometry = sf::st_sfc(sf::st_polygon(list(coords))), crs = sf::st_crs(4326)) %>% sf::st_as_sf())
       shiny::isolate(values$sf <- rbind(values$sf, new_sf))
+
+    }
+
+
 
       bbox <- values$sf %>% sf::st_transform(crs = raster::crs(in_ras$chmR))
 
@@ -168,15 +247,7 @@ isolate({
               primaryAreaUnit = "acres",
               activeColor = "#000000",
               completedColor = "#FF0000"
-            ) %>%
-            htmlwidgets::onRender("
-        function(el, x) {
-          var myMap = this;
-          myMap.on('measurefinish',
-            function (e) {
-              Shiny.onInputChange('selectedPoints', e.points);
-            })
-        }")
+            )
 
         })
 
@@ -215,21 +286,13 @@ isolate({
             primaryAreaUnit = "acres",
             activeColor = "#000000",
             completedColor = "#FF0000"
-          ) %>%
-          htmlwidgets::onRender("
-        function(el, x) {
-          var myMap = this;
-          myMap.on('measurefinish',
-            function (e) {
-              Shiny.onInputChange('selectedPoints', e.points);
-            })
-        }")
+          )
 
 
 
       })
 
-      in_ras$rec_feat <- reactive(input$leaf_map_draw_new_feature)
+      in_ras$rec_feat <- reactive(input$leaf_map_all_features)
 })
       }
 

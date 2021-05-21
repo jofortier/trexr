@@ -32,7 +32,15 @@ mod_in_file_server <- function(input, output, session, in_ras,HTboxI, file_path,
   if (is.null(inFile)){
     return(NULL)}
 
-  chmR<-raster::raster(inFile$datapath)
+  if(length(inFile$datapath)>1){
+
+chmR <- mosaicList(inFile$datapath)
+
+  } else {
+
+    chmR<-raster::raster(inFile$datapath)
+  }
+
   chmR[chmR[]<0]<-0
   chmR[chmR[]<0] <- NA
 

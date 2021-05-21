@@ -14,27 +14,24 @@ Imports:
     leaflet,
     leaflet.extras,
     rgeos,
+    rgdal,
     rgl,
     rlang,
     shinycssloaders,
-    sp,
-    stars,
-    fs,
-    magrittr,
-    processx,
-    raster,
     rasterVis,
+    shinyalert,
+    magrittr,
+    raster,
     rglwidget,
+    sp,
     sf,
     shiny,
     shinydashboard,
     shinydashboardPlus,
-    thinkr,
     geometry,
     dashboardthemes,
-    shinyalert,
     htmlwidgets,
-    zip
+    pkgload
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1

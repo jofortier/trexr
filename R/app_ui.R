@@ -34,7 +34,8 @@ app_ui <- function(request) {
                                          ),
                                        conditionalPanel(condition = "input.menu1 === 'chm_cp'",
                                                         fileInput("chm", "Please Select File",
-                                                                  accept = c('.tif', '.asc', '.img')),
+                                                                  accept = c('.tif', '.asc', '.img'), multiple = TRUE),
+
                                                         div(style = "padding: 14px 14px; margin-top:-2.5em",
                                                             fluidRow(sliderInput("HTboxI",
                                                                     label = "Filter Canopy Height Range:",
@@ -107,9 +108,11 @@ app_ui <- function(request) {
                                         shinydashboard::box( uiOutput('logic') %>% shinycssloaders::withSpinner(), width = 6, title = 'Mapping'),
                                         shinydashboard::box( mod_panel_3d_ui("panel_3d_ui_1"), width = 6, title = '3D Mapping'),
                                         shinydashboard::box(mod_panel_stat_plot_ui("panel_stat_plot_ui_1"), width = 6,height = '500px', title = "Plotting",
-                                                            radioButtons('plot_rad', label = '', choices = list('Boxplot' = 'bp', 'Density' = 'dens',
+                                                            column(width = 7,radioButtons('plot_rad', label = '', choices = list('Boxplot' = 'bp', 'Density' = 'dens',
                                                                                                                 'Histogram' = 'hist'), selected = 'hist',
                                                                          inline = TRUE)),
+                                                            column(width = 5,downloadButton(outputId = "csv",
+                                                                           label = "Download Plot Data"))),
                                         shinydashboard::box(mod_panel_stats_ui("panel_stats_ui_1"), width = 6, height = '500px', title = 'Summary Stats')
                                        )
 
@@ -141,7 +144,8 @@ golem_add_external_resources <- function(){
       path = app_sys('app/www'),
       app_title = 'trexr'
     ),
-    shinyalert::useShinyalert()
+    shinyalert::useShinyalert(),
+    shinyjs::useShinyjs()
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert()
   )

@@ -14,6 +14,7 @@ run_app <- function(
       ui = app_ui,
       server = app_server,
       options = list(launch.browser = TRUE)
+
     ),
     golem_opts = list(...)
   )

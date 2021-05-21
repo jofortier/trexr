@@ -19,6 +19,7 @@ app_server <- function( input, output, session ) {
   input_box <- reactiveValues()
   values <- shiny::reactiveValues(data = NULL)
   points <- reactiveValues()
+  shape <- reactiveValues()
 
 
 
@@ -91,6 +92,15 @@ app_server <- function( input, output, session ) {
   callModule(mod_panel_stat_plot_server, "panel_stat_plot_ui_1",in_ras = in_ras, clear_map = reactive(input$clear),
              plot_rad = reactive(input$plot_rad), values = values)
 
+  output$csv <- downloadHandler(
+    filename = function() {
+      paste('plot_data_',input$plot_rad,Sys.Date(), '.csv', sep = '')
+    },
+    content = function(file){
+      write.csv(values$dat_plot,file)
+    }
+  )
+
   output$logic <- renderUI({
 
     req(in_ras$chmR_rec)
@@ -108,6 +118,41 @@ app_server <- function( input, output, session ) {
     }
 
   })
+
+
+  observeEvent(input$shape,{
+
+    showModal(modalFileInput())
+
+})
+
+  observeEvent(input$shapefile,  {
+
+    print('shapefile')
+    shpdf <- input$shapefile
+
+    if(is.null(shpdf)){
+      return()
+    }
+    previouswd <- getwd()
+    uploaddirectory <- dirname(shpdf$datapath[1])
+    setwd(uploaddirectory)
+    for(i in 1:nrow(shpdf)){
+      file.rename(shpdf$datapath[i], shpdf$name[i])
+    }
+    setwd(previouswd)
+
+
+    map <- rgdal::readOGR(paste(uploaddirectory, shpdf$name[grep(pattern="*.shp$", shpdf$name)], sep="/"))#,  delete_null_obj=TRUE)
+    map <- sp::spTransform(map, sp::CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"))
+    shape$dat <- map
+
+  })
+
+  observeEvent(input$shapefile, {
+    removeModal()
+  })
+
 
   # points$pts <- reactive(input$selectedPoints)
   #
@@ -154,7 +199,7 @@ app_server <- function( input, output, session ) {
   #   )
   # })
   callModule(mod_panel_leaflet_server, "panel_leaflet_ui_1", in_ras = in_ras,
-             clear_map = reactive(input$clear), values = values)
+             clear_map = reactive(input$clear), values = values, shape = shape, clip = reactive(input$crop))
   callModule(mod_panel_plot_map_server, "panel_plot_map_ui_1", in_ras = in_ras)
   callModule(mod_panel_3d_server, "panel_3d_ui_1", in_ras = in_ras, clear_map = reactive(input$clear),
              sws = reactive(input$sws),
