@@ -10,11 +10,11 @@ please see
 [weblidar-treetop](https://github.com/carlos-alberto-silva/weblidar-treetop)
 excellent app (a lot of the inspiration for this app was from
 [weblidar-treetop](https://github.com/carlos-alberto-silva/weblidar-treetop)).
-This package allows the user to do explore canopy height models (CHM)
+This package allows the user to explore canopy height models (CHM)
 through graphs (histograms, density, boxplot), map (leaflet), 3-d and
-stats. The main feature is the ability to crop your input (AOI) and
-generate new information. In addition, users can convert from meters to
-feet (vice-versa) or change height (filter) CHM on the fly.
+stats. The main features are: ability to crop your input (AOI) and
+generate new information, users can convert from meters to feet
+(vice-versa) or change height (filter) CHM on the fly.
 
 ## Installation
 
@@ -37,6 +37,4 @@ run_app()
 
 ## Video
 
-<video width="320" height="240" controls>
-<source src="inst/app/www/trexr_vid.mp4" type="video/mp4">
-</video>
+<img src='inst/app/www/trexrgif.gif' class = 'center'>
