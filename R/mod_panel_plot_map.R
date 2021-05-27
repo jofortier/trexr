@@ -1,10 +1,9 @@
 #' panel_plot_map UI Function
 #'
-#' @description A shiny Module.
+#' @description A shiny Module defaults to a basic raster image if there is no projection on the fileInput raster.
 #'
-#' @param id,input,output,session Internal parameters for {shiny}.
+#' @param id Internal parameters for {shiny}.
 #'
-#' @noRd
 #'
 #' @importFrom shiny NS tagList
 mod_panel_plot_map_ui <- function(id){
@@ -15,8 +14,8 @@ mod_panel_plot_map_ui <- function(id){
 }
 
 #' panel_plot_map Server Function
-#'
-#' @noRd
+#' @param input,output,session Internal parameters for {shiny}.
+#' @param in_ras A reactiveValues that contains numerous rasters.
 mod_panel_plot_map_server <- function(input, output, session, in_ras){
   ns <- session$ns
   output$plot_map <- renderPlot({

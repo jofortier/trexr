@@ -4,6 +4,12 @@
 
 
 
+#' Leaflet Basemap
+#'
+#' @description A preloaded leaflet map to use in the leaflet panel
+#'
+#' @return
+#'
 base_map <- function() {
 
 

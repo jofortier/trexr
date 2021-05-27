@@ -32,8 +32,6 @@ app_server <- function( input, output, session ) {
              change_ht = reactive(input$change_ht),
              input_box = input_box,
              values = values,
-             zvalues = reactive(input$zvalues),
-             zsel = reactive(input$zsel),
              met = reactive(input$met),
              lab_sel = reactive(input$lab_sel))
 

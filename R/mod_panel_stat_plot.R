@@ -1,9 +1,9 @@
 #' panel_stat_plot UI Function
 #'
-#' @description A shiny Module.
+#' @description A shiny Module that controls the plotting section of the panels. This let's the user switch between plots and also metric labels (feet/meters). It also is reactive
+#' to the cropping feature in leaflet.
 #'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#' @noRd
+#' @param id Internal parameters for {shiny}.
 #'
 #' @importFrom shiny NS tagList
 #' @importFrom ggplot2 ggplot aes geom_col labs theme_bw coord_flip scale_fill_gradientn geom_point geom_line geom_boxplot
@@ -16,8 +16,14 @@ mod_panel_stat_plot_ui <- function(id){
 }
 
 #' panel_stat_plot Server Function
+#' @param input,output,session Internal parameters for {shiny}.
+#' @param in_ras A reactiveValues that contains numerous rasters.
+#' @param clear_map This is a reactive input that will clear everything back to the beginning. Some checkboxs will not
+#' be set back to original (feet/meters) but height and aoi will.
+#' @param plot_rad This is a reactive that determines what plot type to use, e.g. 'hist', 'dens', or 'bp'.
+#' @param values A reactiveValues that stores the sf information when cropping leaflet map. This makes it possible to crop but also let's
+#' the app know what metric to use (feet/meters).
 #'
-#' @noRd
 mod_panel_stat_plot_server <- function(input, output, session,in_ras, clear_map, plot_rad, values){
   ns <- session$ns
 

@@ -1,10 +1,10 @@
 #' panel_stats UI Function
 #'
-#' @description A shiny Module.
+#' @description A shiny Module that controls the stats section of the panels. This let's the user switch metric labels (feet/meters) but is also reactive
+#' to the cropping feature in leaflet.
 #'
-#' @param id,input,output,session Internal parameters for {shiny}.
+#' @param id Internal parameters for {shiny}.
 #'
-#' @noRd
 #'
 #' @importFrom shiny NS tagList
 mod_panel_stats_ui <- function(id){
@@ -18,7 +18,13 @@ mod_panel_stats_ui <- function(id){
 
 #' panel_stats Server Function
 #'
-#' @noRd
+#' @param input,output,session Internal parameters for {shiny}.
+#' @param in_ras A reactiveValues that contains numerous rasters.
+#' @param clear_map This is a reactive input that will clear everything back to the beginning. Some checkboxs will not
+#' be set back to original (feet/meters) but height and aoi will.
+#' @param values A reactiveValues that stores the sf information when cropping leaflet map. This makes it possible to crop but also let's
+#' the app know what metric to use (feet/meters).
+#'
 mod_panel_stats_server <- function(input, output, session, in_ras, clear_map, values){
   ns <- session$ns
 

@@ -2,9 +2,8 @@
 #'
 #' @description A shiny Module that generates the 3d model of the input raster.
 #'
-#' @param id,input,output,session Internal parameters for {shiny}.
+#' @param id Internal parameters for {shiny}.
 #'
-#' @noRd
 #'
 #' @importFrom shiny NS tagList
 mod_panel_3d_ui <- function(id){
@@ -16,7 +15,15 @@ mod_panel_3d_ui <- function(id){
 
 #' panel_3d Server Function
 #'
-#' @noRd
+#' @param input,output,session Internal parameters for {shiny}.
+#' @param in_ras A reactiveValues that contains numerous rasters
+#' @param clear_map This is a reactive input that will clear everything back to the beginning. Some checkboxs will not
+#' be set back to original (feet/meters) but height and aoi will.
+#' @param values A reactiveValues that stores the sf information when cropping leaflet map. This makes it possible to crop but also let's
+#' the app know what metric to use (feet/meters).
+#' @param smooth3d Let's the server know whether to switch to smoothing or not. Reactive.
+#' @param sws Reactive that determines the window size of smoothing.
+#'
 mod_panel_3d_server <- function(input, output, session, in_ras, clear_map, smooth3d, sws, values){
   ns <- session$ns
 

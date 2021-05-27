@@ -1,10 +1,10 @@
 #' panel_leaflet UI Function
 #'
-#' @description A shiny Module.
+#' @description A shiny Module that controls the leaflet map panel. This function has the ability to crop, draw and change overlays.
 #'
-#' @param id,input,output,session Internal parameters for {shiny}.
+#' @param id Internal parameters for {shiny}.
 #'
-#' @noRd
+#'
 #'
 #' @importFrom shiny NS tagList
 #' @importFrom magrittr '%>%'
@@ -18,8 +18,13 @@ mod_panel_leaflet_ui <- function(id){
 }
 
 #' panel_leaflet Server Function
+#' @param input,output,session Internal parameters for {shiny}.
+#' @param in_ras A reactiveValues that contains numerous rasters
+#' @param clear_map This is a reactive input that will clear everything back to the beginning. Some checkboxs will not
+#' be set back to original (feet/meters) but height and aoi will.
+#' @param values A reactiveValues that stores the sf information when cropping leaflet map. This makes it possible to crop but also let's
+#' the app know what metric to use (feet/meters).
 #'
-#' @noRd
 mod_panel_leaflet_server <- function(input, output, session, in_ras, clear_map, values){
 
    ns <- session$ns

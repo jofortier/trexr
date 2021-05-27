@@ -1,8 +1,9 @@
 #' in_file UI Function
 #'
-#' @description A shiny Module.
+#' @description A shiny Module that controls the in-flow of data. This function is important as it set's up all the other functions in the app. Manipulating this file will likely cause the other panels to fail so
+#' use with cation. It also contains a lot of producers (input) and consumers (output) in addition to reactive expressions. This function is the starting line!
 #'
-#' @param id,input,output,session Internal parameters for {shiny}.
+#' @param id Internal parameters for {shiny}.
 #'
 #' @noRd
 #'
@@ -20,9 +21,23 @@ mod_in_file_ui <- function(id){
 
 #' in_file Server Function
 #'
-#' @noRd
+#' @param input,output,session Internal parameters for {shiny}.
+#' @param in_ras A reactiveValues that contains numerous rasters
+#' @param HTboxI A reactive that holds the change height.
+#' @param file_path A reactive that let's the function know that it can start running (e.g. after a file path has been recognized).
+#' @param clear_map This is a reactive input that will clear everything back to the beginning. Some checkboxs will not
+#' be set back to original (feet/meters) but height and aoi will.
+#' @param change_ht A reactive that initiates the button to change height.
+#' @param input_box A reactiveValues that when the app is cleared the heights will go back to the original values.
+#' @param feet A reactive that initiates the observeEvent to look at whether to use feet or meters when converting raster.
+#' @param values A reactiveValues that stores the sf information when cropping leaflet map. This makes it possible to crop but also let's
+#' the app know what metric to use (feet/meters).
+#' @param switch_fil A reactive that actually changes back/forth from feet/meters
+#' @param met A reactive that initiates the observeEvent to look at whether to use feet or meters when converting raster.
+#' @param lab_sel A reactive that initiates the option for labeling in ft or meters or z.
+#'
 mod_in_file_server <- function(input, output, session, in_ras,HTboxI, file_path, clear_map, change_ht,
-                               input_box, feet, values, switch_fil, zvalues, zsel, met, lab_sel){
+                               input_box, feet, values, switch_fil,met, lab_sel){
   ns <- session$ns
 
 

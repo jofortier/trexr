@@ -6,3 +6,6 @@ dev_history.R
 $run_dev.*
 ^CODE_OF_CONDUCT\.md$
 ^LICENSE\.md$
+^doc$
+^Meta$
+^README\.Rmd$
