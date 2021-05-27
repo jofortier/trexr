@@ -107,6 +107,16 @@ app_server <- function( input, output, session ) {
 
   })
 
+  output$csv <- downloadHandler(
+    filename = function() {
+      paste('plot_data_',input$plot_rad,Sys.Date(), '.csv', sep = '')
+    },
+    content = function(file){
+      write.csv(values$dat_plot,file)
+    }
+  )
+
+
   # points$pts <- reactive(input$selectedPoints)
   #
   #

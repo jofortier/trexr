@@ -33,95 +33,102 @@ mod_panel_stat_plot_server <- function(input, output, session,in_ras, clear_map,
   observeEvent(in_ras$chmR_rec, {
     showNotification(ui = "rendering graph")
 
-isolate({
+    isolate({
 
-observe({
-  if(is.null(in_ras$ras_crop)){
+      observe({
+        if(is.null(in_ras$ras_crop)){
 
-if(plot_rad() == 'hist'){
-     f_all <- raster::hist(in_ras$chmR, breaks = 30, plot = F)
-     dat <- data.frame(counts= f_all$counts,breaks = f_all$mids)
-     output$hist <- shiny::renderPlot({
-       ggplot(dat, aes(x = .data[['breaks']], y = .data[['counts']])) +
-         geom_col(aes(fill = .data[['breaks']]), col = 'black') +
-         theme_bw() + scale_fill_gradientn(colors = myPal)+
-         coord_flip()+
-         labs(x = paste0(values$data))
-     })
+          if(plot_rad() == 'hist'){
+            f_all <- raster::hist(in_ras$chmR, breaks = 30, plot = F)
+            values$dat_plot <- data.frame(counts= f_all$counts,breaks = f_all$mids)
 
-}
+            output$hist <- shiny::renderPlot({
+              ggplot(values$dat_plot, aes(x = .data[['breaks']], y = .data[['counts']])) +
+                geom_col(aes(fill = .data[['breaks']]), col = 'black') +
+                theme_bw() + scale_fill_gradientn(colors = myPal)+
+                coord_flip()+
+                labs(x = paste0(values$data))
+            })
 
-    if (plot_rad() == 'dens'){
-
-  f_all <- raster::density(in_ras$chmR, plot = F)
-  dat <- data.frame(x= f_all$x, y = f_all$y)
-  output$hist <- shiny::renderPlot({
-    ggplot(dat, aes(x = .data[['x']], y = .data[['y']])) +
-      geom_line() +
-      theme_bw() +
-      coord_flip() +
-      labs(x = paste0(values$data))
-  })
-}
-
-    if (plot_rad() == 'bp') {
-
-  f_all <- raster::boxplot(in_ras$chmR,plot = F)
-  dat <- data.frame(stats = f_all$stats, name = 'Raster')
-
-  output$hist <- shiny::renderPlot({
-    ggplot(data = dat, aes(.data[['stats']], .data[['name']])) +
-      geom_boxplot() + coord_flip() + theme_bw() +
-      labs(y = '', x = paste0(values$data))
-
-  })
-    }
-
-    } else {
-
-      if(plot_rad() == 'hist'){
-              f_all <- raster::hist(in_ras$ras_crop, breaks = 30, plot = F)
-              dat <- data.frame(counts= f_all$counts,breaks = f_all$mids)
-              output$hist <- shiny::renderPlot({
-                ggplot(dat, aes(x = .data[['breaks']], y = .data[['counts']])) +
-                  geom_col(aes(fill = .data[['breaks']]), col = 'black') +
-                  theme_bw() + scale_fill_gradientn(colors = myPal)+
-                  coord_flip()+
-                  labs(x = paste0(values$data))
-              })
-
-            }
+          }
 
           if (plot_rad() == 'dens'){
 
-              f_all <- raster::density(in_ras$ras_crop, plot = F)
-              dat <- data.frame(x= f_all$x, y = f_all$y)
-              output$hist <- shiny::renderPlot({
-                ggplot(dat, aes(x = .data[['x']], y = .data[['y']])) +
-                  geom_line() +
-                  theme_bw() +
-                  coord_flip() +
-                  labs(x = paste0(values$data))
-              })
-            }
+            f_all <- raster::density(in_ras$chmR, plot = F)
+            values$dat_plot <- data.frame(x= f_all$x, y = f_all$y)
+            output$hist <- shiny::renderPlot({
+              ggplot(values$dat_plot, aes(x = .data[['x']], y = .data[['y']])) +
+                geom_line() +
+                theme_bw() +
+                coord_flip() +
+                labs(x = paste0(values$data))
+            })
+          }
 
           if (plot_rad() == 'bp') {
 
-              f_all <- raster::boxplot(in_ras$ras_crop,plot = F)
-              dat <- data.frame(stats = f_all$stats, name = 'Raster')
+            f_all <- raster::boxplot(in_ras$chmR,plot = F)
+            values$dat_plot <- data.frame(stats = f_all$stats, name = 'Raster')
 
-              output$hist <- shiny::renderPlot({
-                ggplot(data = dat, aes(.data[['stats']], .data[['name']])) +
-                  geom_boxplot() + coord_flip() + theme_bw() +
-                  labs(y = '', x = paste0(values$data))
+            output$hist <- shiny::renderPlot({
+              ggplot(data = values$dat_plot, aes(.data[['stats']], .data[['name']])) +
+                geom_boxplot() + coord_flip() + theme_bw() +
+                labs(y = '', x = paste0(values$data))
 
-              })
+            })
+          }
 
-            }
-    }
+        } else {
+
+          if(plot_rad() == 'hist'){
+            f_all <- raster::hist(in_ras$ras_crop, breaks = 30, plot = F)
+            values$dat_plot <- data.frame(counts= f_all$counts,breaks = f_all$mids)
+            output$hist <- shiny::renderPlot({
+              ggplot(values$dat_plot, aes(x = .data[['breaks']], y = .data[['counts']])) +
+                geom_col(aes(fill = .data[['breaks']]), col = 'black') +
+                theme_bw() + scale_fill_gradientn(colors = myPal)+
+                coord_flip()+
+                labs(x = paste0(values$data))
+            })
+
+
+          }
+
+          if (plot_rad() == 'dens'){
+
+            f_all <- raster::density(in_ras$ras_crop, plot = F)
+            values$dat_plot <- data.frame(x= f_all$x, y = f_all$y)
+            output$hist <- shiny::renderPlot({
+              ggplot(values$dat_plot, aes(x = .data[['x']], y = .data[['y']])) +
+                geom_line() +
+                theme_bw() +
+                coord_flip() +
+                labs(x = paste0(values$data))
+            })
+          }
+
+          if (plot_rad() == 'bp') {
+
+            f_all <- raster::boxplot(in_ras$ras_crop,plot = F)
+            values$dat_plot <- data.frame(stats = f_all$stats, name = 'Raster')
+
+            output$hist <- shiny::renderPlot({
+              ggplot(data = values$dat_plot, aes(.data[['stats']], .data[['name']])) +
+                geom_boxplot() + coord_flip() + theme_bw() +
+                labs(y = '', x = paste0(values$data))
+
+            })
+
+          }
+        }
+
+
+      })
+
+    })
   })
-  })
-})
+
+
 
   observeEvent(in_ras$rec_feat,{
 
@@ -131,9 +138,9 @@ if(plot_rad() == 'hist'){
 
       if(plot_rad() == 'hist'){
         f_all <- raster::hist(in_ras$ras_crop, breaks = 30, plot = F)
-        dat <- data.frame(counts= f_all$counts,breaks = f_all$mids)
+        values$dat_plot <- data.frame(counts= f_all$counts,breaks = f_all$mids)
         output$hist <- shiny::renderPlot({
-          ggplot(dat, aes(x = .data[['breaks']], y = .data[['counts']])) +
+          ggplot(values$dat_plot, aes(x = .data[['breaks']], y = .data[['counts']])) +
             geom_col(aes(fill = .data[['breaks']]), col = 'black') +
             theme_bw() + scale_fill_gradientn(colors = myPal)+
             coord_flip()+
@@ -145,9 +152,9 @@ if(plot_rad() == 'hist'){
       if (plot_rad() == 'dens'){
 
         f_all <- raster::density(in_ras$ras_crop, plot = F)
-        dat <- data.frame(x= f_all$x, y = f_all$y)
+        values$dat_plot <- data.frame(x= f_all$x, y = f_all$y)
         output$hist <- shiny::renderPlot({
-          ggplot(dat, aes(x = .data[['x']], y = .data[['y']])) +
+          ggplot(values$dat_plot, aes(x = .data[['x']], y = .data[['y']])) +
             geom_line() +
             theme_bw() +
             coord_flip() +
@@ -158,10 +165,10 @@ if(plot_rad() == 'hist'){
       if (plot_rad() == 'bp') {
 
         f_all <- raster::boxplot(in_ras$ras_crop,plot = F)
-        dat <- data.frame(stats = f_all$stats, name = 'Raster')
+        values$dat_plot <- data.frame(stats = f_all$stats, name = 'Raster')
 
         output$hist <- shiny::renderPlot({
-          ggplot(data = dat, aes(.data[['stats']], .data[['name']])) +
+          ggplot(data = values$dat_plot, aes(.data[['stats']], .data[['name']])) +
             geom_boxplot() + coord_flip() + theme_bw() +
             labs(y = '', x = paste0(values$data))
 

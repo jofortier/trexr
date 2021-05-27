@@ -107,9 +107,11 @@ app_ui <- function(request) {
                                         shinydashboard::box( uiOutput('logic') %>% shinycssloaders::withSpinner(), width = 6, title = 'Mapping'),
                                         shinydashboard::box( mod_panel_3d_ui("panel_3d_ui_1"), width = 6, title = '3D Mapping'),
                                         shinydashboard::box(mod_panel_stat_plot_ui("panel_stat_plot_ui_1"), width = 6,height = '500px', title = "Plotting",
-                                                            radioButtons('plot_rad', label = '', choices = list('Boxplot' = 'bp', 'Density' = 'dens',
-                                                                                                                'Histogram' = 'hist'), selected = 'hist',
-                                                                         inline = TRUE)),
+                                                            column(width = 7,radioButtons('plot_rad', label = '', choices = list('Boxplot' = 'bp', 'Density' = 'dens',
+                                                                                                                                 'Histogram' = 'hist'), selected = 'hist',
+                                                                                          inline = TRUE)),
+                                                            column(width = 5,downloadButton(outputId = "csv",
+                                                                                            label = "Download Plot Data"))),
                                         shinydashboard::box(mod_panel_stats_ui("panel_stats_ui_1"), width = 6, height = '500px', title = 'Summary Stats')
                                        )
 
